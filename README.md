@@ -149,6 +149,8 @@ flowchart LR
 | `chore` | 🔧 | — | Maintenance that fits nowhere else |
 | `revert` | ⏪️ | patch | Undoes an earlier commit |
 
+`feat` always carries ✨. In the official catalog only ✨ is `minor` and only 💥 is `major`, so a `patch` gitmoji such as 🚸 or 💄 on a `feat` announces a version bump it does not carry. Area-specific gitmojis describe a change to something that already exists, which lands on `fix`, `perf`, `refactor` or `chore`.
+
 A breaking change keeps its type and adds 💥 and `!`:
 
 ```

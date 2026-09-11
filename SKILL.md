@@ -113,7 +113,7 @@ Tie-breakers:
 
 - Something that never existed is `feat`, even when someone reported it as a bug.
 - A refactor that also fixes a bug should be split. If you can't separate them, use `fix`.
-- CSS/UI changes are `feat` or `fix` (💄), never `style`.
+- CSS/UI changes are `feat` or `fix`, never `style`. New UI is `✨ feat`; restyling or repairing existing UI is `💄 fix`.
 - `chore` is the last resort, not a catch-all.
 - **Breaking change** (removed or renamed API, incompatible contract or config): keep the type, use 💥 and `!`, and add a footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
 
@@ -122,10 +122,12 @@ Tie-breakers:
 Start from the type's default. Switch to a more specific gitmoji only when it describes the whole commit.
 The gitmoji and the type must be a valid pair. Look anything missing up in [references/gitmojis.md](references/gitmojis.md) (all 75, with their valid types).
 
+**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. So `🚸 feat` or `💄 feat` announces a version bump the gitmoji does not carry. Whatever area a change touches, if it introduces something that did not exist it is `✨ feat`; the area-specific gitmojis are for changing something that already exists, which makes them `fix` (or `perf`, `refactor`, `chore`).
+
 | Type | Default | Specific |
 |---|---|---|
-| feat | ✨ | 💄 UI · 🌐 i18n · ♿️ a11y · 🗃️ database · 🛂 roles/permissions · 🦺 validation · 🔍️ SEO · 📈 analytics · 🚸 UX · 📱 responsive · 💫 animations · 💬 texts · 👔 business logic · 🚩 feature flags · 🍱 assets |
-| fix | 🐛 | 🚑️ critical hotfix · 🩹 minor fix · 🔒️ security · 🥅 error handling · ✏️ typo · 👽️ external API change · 🚨 warnings |
+| feat | ✨ | — (only 💥 for a breaking change, with `!`) |
+| fix | 🐛 | 🚑️ critical hotfix · 🩹 minor fix · 🔒️ security · 🥅 error handling · ✏️ typo · 👽️ external API change · 🚨 warnings · 💄 UI · 🚸 UX · 📱 responsive · 💫 animations · 💬 texts · ♿️ a11y · 🌐 i18n · 🔍️ SEO · 📈 analytics · 🛂 roles/permissions · 👔 business logic · 🦺 validation · ✈️ offline · 🗃️ database · 🏷️ types · 🦖 backwards compatibility · 🍱 assets · 🩺 healthcheck |
 | refactor | ♻️ | 🏗️ architecture · 🚚 move/rename · 🔥 remove code · ⚰️ dead code · 🗑️ deprecation · 🏷️ types |
 | perf | ⚡️ | 🧵 concurrency · 🗃️ queries |
 | style | 🎨 | 🚨 lint warnings |
@@ -133,7 +135,7 @@ The gitmoji and the type must be a valid pair. Look anything missing up in [refe
 | test | ✅ | 🧪 failing test · 🤡 mocks · 📸 snapshots |
 | build | 📦️ | ⬆️ upgrade · ⬇️ downgrade · ➕ add dep · ➖ remove dep · 📌 pin · 🧱 infrastructure |
 | ci | 👷 | 💚 fix CI · 🚀 deploy |
-| chore | 🔧 | 🔨 dev scripts · 🙈 .gitignore · 🔖 release · 🎉 first commit · 🌱 seeds · 🔐 secrets setup · 🧑‍💻 DX · 🔊 🔇 logs |
+| chore | 🔧 | 🔨 dev scripts · 🙈 .gitignore · 🔖 release · 🎉 first commit · 🌱 seeds · 🔐 secrets setup · 🧑‍💻 DX · 🔊 🔇 logs · 🚩 feature flags · ⚗️ experiments · 💸 sponsorship/billing · 🥚 easter eggs |
 | revert | ⏪️ | — |
 
 Keep 🚧 💩 🍻 out of shared history.
@@ -233,7 +235,7 @@ If you have no file tool, run `git commit -m "<header>" -m "<paragraph>" -m "<pa
 
 Before each commit, check:
 
-- [ ] it holds one intent, the type matches the diff, and the gitmoji is valid for that type
+- [ ] it holds one intent, the type matches the diff, and the gitmoji is valid for that type (a `feat` carries ✨, or 💥 with `!`)
 - [ ] the scope is a domain, and the title is a noun phrase in the repository's language that doesn't repeat the scope, with no leading verb and no trailing period
 - [ ] the body explains why and what the impact is, with no headings, file lists or AI credit
 - [ ] nothing staged contains a secret, a session note or a temporary file

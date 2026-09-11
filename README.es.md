@@ -150,6 +150,8 @@ flowchart LR
 | `chore` | 🔧 | — | Mantenimiento que no encaja en otro tipo |
 | `revert` | ⏪️ | patch | Deshace un commit anterior |
 
+`feat` siempre lleva ✨. En el catálogo oficial solo ✨ es `minor` y solo 💥 es `major`, así que un gitmoji `patch` como 🚸 o 💄 en un `feat` anuncia un salto de versión que ese gitmoji no tiene. Los gitmojis de área describen un cambio sobre algo que ya existe, y eso cae en `fix`, `perf`, `refactor` o `chore`.
+
 Un cambio incompatible mantiene su tipo y añade 💥 y `!`:
 
 ```

@@ -2,46 +2,48 @@
 
 All 75 gitmojis, sorted by main type.
 **Types** = commit types the gitmoji may be used with (first = main). Any pair not listed here is invalid.
+
+**`feat` only pairs with ✨ and 💥.** The official gitmoji catalog gives each gitmoji a `semver`
+level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`;
+every other gitmoji is `patch` or `null`, so pairing one with `feat` claims a version bump the
+gitmoji does not carry. A change that introduces something that did not exist is `✨ feat`, whatever
+area it touches. The specific gitmojis below describe changes to something that already exists.
+
 `⚡️` and `⚡` (with or without the variation selector) are the same gitmoji.
 
 | Gitmoji | Code | Types | Use for |
 |---|---|---|---|
-| ✨ | `:sparkles:` | feat | A capability that did not exist before: new screen, endpoint, option, command, integration. **default feat** |
-| 💄 | `:lipstick:` | feat, fix | A change whose essence is visual: styles, themes, layout, spacing, colors. Use feat for new visuals, fix for broken ones. |
-| 🚧 | `:construction:` | feat, fix, refactor | ⚠ Work in progress. Only on personal branches that will be squashed. |
-| 📈 | `:chart_with_upwards_trend:` | feat, fix | Analytics, tracking events, metrics instrumentation. |
-| 🌐 | `:globe_with_meridians:` | feat, fix | Translations, locales, date/number formatting per locale. |
-| 💩 | `:poop:` | feat, fix, refactor | ⚠ Knowingly bad code to improve later. Avoid in shared history; prefer a TODO with a ticket. |
+| ✨ | `:sparkles:` | feat | A capability that did not exist before: new screen, endpoint, option, command, integration, new UI, a new language, a new permission, a new validation rule. **the only feat gitmoji** |
 | 💥 | `:boom:` | feat, fix, refactor, perf, build | Breaking change: consumers must change something. Always paired with `!` after the scope and a BREAKING CHANGE footer. |
-| 🍱 | `:bento:` | feat, fix, chore | Static assets: images, icons, fonts, media. |
-| ♿️ | `:wheelchair:` | feat, fix | Accessibility: keyboard navigation, ARIA, contrast, screen-reader support. |
-| 💬 | `:speech_balloon:` | feat, fix | User-facing text, copy, messages, literals. |
-| 🗃️ | `:card_file_box:` | feat, fix, refactor, perf | Database changes: schema, migrations, indexes, queries whose essence is the data layer. |
-| 🔊 | `:loud_sound:` | feat, chore | Adding or improving logs. |
-| 🚸 | `:children_crossing:` | feat, fix | Usability: fewer steps, clearer flows, better feedback to the user. |
-| 📱 | `:iphone:` | feat, fix | Responsive design and mobile layouts. |
-| 🥚 | `:egg:` | feat | Easter eggs. |
-| ⚗️ | `:alembic:` | feat, chore | Experiments and spikes that are expected to be revisited. |
-| 🔍️ | `:mag:` | feat, fix | SEO: meta tags, sitemaps, structured data, indexability. |
-| 🏷️ | `:label:` | feat, fix, refactor | Type definitions and typings (TypeScript types, interfaces, schemas for types). |
-| 🚩 | `:triangular_flag_on_post:` | feat, chore | Adding, changing or removing feature flags. |
-| 💫 | `:dizzy:` | feat, fix | Animations and transitions. |
-| 🛂 | `:passport_control:` | feat, fix | Authorization, roles and permissions. |
-| 👔 | `:necktie:` | feat, fix | Business rules and domain logic: calculations, policies, workflows of the domain. |
-| 🩺 | `:stethoscope:` | feat, fix | Healthchecks and readiness/liveness probes. |
-| 💸 | `:money_with_wings:` | feat, chore | Sponsorships, billing or money-related infrastructure. |
-| 🧵 | `:thread:` | feat, fix, perf, refactor | Concurrency, multithreading, async coordination, locks, queues. |
-| 🦺 | `:safety_vest:` | feat, fix | Input validation and data validation rules. |
-| ✈️ | `:airplane:` | feat, fix | Offline support, caching for offline use, sync on reconnect. |
-| 🦖 | `:t-rex:` | feat, fix, refactor | Backwards compatibility: shims, polyfills, keeping old clients working. |
 | 🐛 | `:bug:` | fix | A behavior that was supposed to work and did not: wrong result, crash, broken flow. **default fix** |
 | 🚑️ | `:ambulance:` | fix | Urgent fix shipped straight to production (hotfix) because something critical is down or losing data. |
 | 🔒️ | `:lock:` | fix | Closing a security or privacy hole: injection, leaked data, missing auth check, unsafe defaults. |
+| 🩹 | `:adhesive_bandage:` | fix | Small, non-critical fix: an edge case, a minor glitch. |
+| 🥅 | `:goal_net:` | fix | Catching and handling errors that previously escaped. |
+| 👽️ | `:alien:` | fix, refactor | Adapting to a change in an external API or third-party service. |
 | 🚨 | `:rotating_light:` | fix, style | Silencing compiler or linter warnings. style if it is purely cosmetic, fix if the warning pointed at a real problem. |
 | ✏️ | `:pencil2:` | fix, docs | Typos. docs for typos in documentation, fix for typos users see or that break code. |
-| 👽️ | `:alien:` | fix, refactor | Adapting to a change in an external API or third-party service. |
-| 🥅 | `:goal_net:` | fix, feat | Catching and handling errors that previously escaped. |
-| 🩹 | `:adhesive_bandage:` | fix | Small, non-critical fix: an edge case, a minor glitch. |
+| 💄 | `:lipstick:` | fix | A change whose essence is visual on something that already exists: styles, themes, layout, spacing, colors. |
+| 🚸 | `:children_crossing:` | fix | Usability of an existing flow: fewer steps, clearer wording, better feedback to the user. |
+| 📱 | `:iphone:` | fix | Responsive design and mobile layouts. |
+| 💫 | `:dizzy:` | fix | Animations and transitions. |
+| 💬 | `:speech_balloon:` | fix | Changes to user-facing text, copy, messages, literals that already exist. |
+| ♿️ | `:wheelchair:` | fix | Accessibility: keyboard navigation, ARIA, contrast, screen-reader support. |
+| 🌐 | `:globe_with_meridians:` | fix | Translations, locales, date/number formatting per locale. |
+| 🔍️ | `:mag:` | fix | SEO: meta tags, sitemaps, structured data, indexability. |
+| 📈 | `:chart_with_upwards_trend:` | fix | Analytics, tracking events, metrics instrumentation. |
+| 🛂 | `:passport_control:` | fix | Authorization, roles and permissions. |
+| 👔 | `:necktie:` | fix | Business rules and domain logic: calculations, policies, workflows of the domain. |
+| 🦺 | `:safety_vest:` | fix | Input validation and data validation rules. |
+| ✈️ | `:airplane:` | fix | Offline support, caching for offline use, sync on reconnect. |
+| 🗃️ | `:card_file_box:` | fix, refactor, perf | Database changes: schema, migrations, indexes, queries whose essence is the data layer. |
+| 🏷️ | `:label:` | fix, refactor | Type definitions and typings (TypeScript types, interfaces, schemas for types). |
+| 🧵 | `:thread:` | fix, perf, refactor | Concurrency, multithreading, async coordination, locks, queues. |
+| 🦖 | `:t-rex:` | fix, refactor | Backwards compatibility: shims, polyfills, keeping old clients working. |
+| 🍱 | `:bento:` | fix, chore | Static assets: images, icons, fonts, media. |
+| 🩺 | `:stethoscope:` | fix, chore | Healthchecks and readiness/liveness probes. |
+| 🚧 | `:construction:` | fix, refactor | ⚠ Work in progress. Only on personal branches that will be squashed. |
+| 💩 | `:poop:` | fix, refactor | ⚠ Knowingly bad code to improve later. Avoid in shared history; prefer a TODO with a ticket. |
 | ♻️ | `:recycle:` | refactor | Restructuring code without changing what it does: extract, rename, simplify, reorganize. **default refactor** |
 | 🔥 | `:fire:` | refactor, chore | Removing code or files that are no longer needed. Removing a public capability is a breaking change: use 💥 instead. |
 | 🚚 | `:truck:` | refactor, chore | Moving or renaming files, folders, routes or modules. |
@@ -77,7 +79,12 @@ All 75 gitmojis, sorted by main type.
 | 🍻 | `:beers:` | chore | ⚠ Joke gitmoji. Never in a professional repository. |
 | 🔇 | `:mute:` | chore, refactor | Removing logs. |
 | 🙈 | `:see_no_evil:` | chore | Changes to .gitignore (or other ignore files). |
-| 🌱 | `:seedling:` | chore, feat | Seed data for databases or local environments. |
+| 🌱 | `:seedling:` | chore | Seed data for databases or local environments. |
+| 🔊 | `:loud_sound:` | chore | Adding or improving logs. |
+| 🚩 | `:triangular_flag_on_post:` | chore, fix | Adding, changing or removing feature flags. The capability behind the flag is its own ✨ feat commit. |
+| ⚗️ | `:alembic:` | chore | Experiments and spikes that are expected to be revisited. |
+| 💸 | `:money_with_wings:` | chore | Sponsorships, billing or money-related infrastructure. |
+| 🥚 | `:egg:` | chore, fix | Easter eggs. |
 | 🧐 | `:monocle_face:` | chore | Data exploration and inspection (notebooks, queries, analysis scripts). |
 | 🧑‍💻 | `:technologist:` | chore, build | Developer experience: faster local setup, better tooling, dev containers. |
 | ⏪️ | `:rewind:` | revert | Reverting a previous commit. The body names the reverted commit and why. **default revert** |
