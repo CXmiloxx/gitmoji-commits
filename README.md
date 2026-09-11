@@ -54,8 +54,8 @@ One intent per commit. A title that says what changed. A body that explains why 
 | 🧭 **Adapts to your repository** | It reads recent history to learn the language, the scopes and the emoji style you already use. If commitlint or a written convention exists, it follows that. |
 | 🌍 **Any language** | Commits come out in Spanish, English, French, Portuguese, German or any other language, matching the project. |
 | 🔤 **Programming terms stay in English** | *dashboard*, *endpoint*, *deploy* and *token* are never translated, unless you ask. |
-| 🌳 **Decides the type** | A decision tree with tie-breakers separates `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` and `revert`. |
-| 😀 **All 75 gitmojis** | Each gitmoji is tied to the types it is valid with, so a 🐛 never lands on a `feat`. |
+| 🌳 **Decides the type** | Ten yes/no questions about the changed paths and the diff, first match wins, separate `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` and `revert`. |
+| 😀 **All 75 gitmojis** | Every gitmoji belongs to exactly one type, and the few that allow a second one carry the literal condition that permits it. The pair is looked up in the catalog and verified before the message is written, so a 🐛 never lands on a `feat`. |
 | 📦 **Groups changes** | It splits your working tree into single-intent commits, in logical order. Tests and docs travel with the change they belong to. |
 | 🔐 **Guards what gets committed** | It finds hardcoded tokens, keys, passwords and connection strings, and leaves out `.env` files, session notes, logs, dumps and other leftovers. It tells you what it skipped and why. |
 | 🚫 **No AI signatures** | No `Co-Authored-By` for AI tools, no "Generated with", no 🤖. |
@@ -111,8 +111,8 @@ flowchart LR
 1. **Read.** It runs `git status`, the diff stats, the last 20 commit subjects, and looks for existing rules (commitlint, `COMMIT_CONVENTION.md`, `CONTRIBUTING`).
 2. **Filter.** One `git grep` looks for hardcoded secrets in the changed files. Files that are secret by nature and leftovers (session notes, logs, temporary files, archives, local settings) stay unstaged and are reported.
 3. **Group.** One functional intent per commit, as few commits as possible.
-4. **Type.** It walks a decision tree: revert → docs → test → ci → build → fix/feat → perf/style/refactor → chore.
-5. **Gitmoji.** It starts from the type's default and switches to a specific one only when it describes the whole commit.
+4. **Type.** Ten yes/no questions in order, the first `yes` wins: revert → docs → test → ci → build → feat/fix → perf → style → refactor → chore.
+5. **Gitmoji.** It starts from the type's default, looks the candidate up in the catalog, and keeps it only if the row's type matches (or its exception condition is literally true). The pair is stated and checked against the table before the message is written.
 6. **Language.** In order of priority: what you ask for, then the convention file, then the history, then the README, then the language you write in.
 7. **Message.** A noun-phrase title and a body that explains why and what the impact is.
 8. **Commit.** It stages selectively and commits through a UTF-8 file, so emojis survive on every OS.
@@ -137,8 +137,8 @@ flowchart LR
 
 | Type | Default | Semver | When |
 |---|---|---|---|
-| `feat` | ✨ | minor | A new capability, or an intentional change in behavior |
-| `fix` | 🐛 | patch | Something that was supposed to work and didn't |
+| `feat` | ✨ | minor | Someone can now do something they could not do before |
+| `fix` | 🐛 | patch | Something that was supposed to work and didn't, or any other change to how something existing behaves |
 | `refactor` | ♻️ | — | Code restructured, behavior identical |
 | `perf` | ⚡️ | patch | Same behavior, measurably faster or lighter |
 | `style` | 🎨 | — | Formatting only (never CSS/UI) |
@@ -159,7 +159,7 @@ A breaking change keeps its type and adds 💥 and `!`:
 BREAKING CHANGE: clients must read results from the `items` field.
 ```
 
-The full list of the 75 gitmojis and the types each one is valid with is in [references/gitmojis.md](references/gitmojis.md).
+The full catalog — every gitmoji with its single type and, where one exists, the condition for its only alternate type — is in [references/gitmojis.md](references/gitmojis.md).
 
 ## Examples
 
@@ -224,7 +224,7 @@ The history belongs to the project and its developers. Attribution trailers add 
 gitmoji-commits/
 ├── SKILL.md                       # the workflow the agent follows
 ├── references/
-│   ├── gitmojis.md                # the 75 gitmojis with their valid types (read on demand)
+│   ├── gitmojis.md                # the 75 gitmojis, one type each (read on demand)
 │   └── convention-template.md     # used only when documenting the convention
 ├── README.md
 ├── README.es.md

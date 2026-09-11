@@ -55,8 +55,8 @@ Una intención por commit. Un título que dice qué cambió. Un cuerpo que expli
 | 🧭 **Se adapta al repositorio** | Lee el historial reciente para saber el idioma, los scopes y el estilo de emoji que ya usas. Si hay commitlint o una convención escrita, sigue eso. |
 | 🌍 **Cualquier idioma** | Los commits salen en español, inglés, francés, portugués, alemán o cualquier otro idioma, según el proyecto. |
 | 🔤 **Términos de programación en inglés** | *dashboard*, *endpoint*, *deploy* o *token* no se traducen, salvo que lo pidas. |
-| 🌳 **Decide el tipo** | Un árbol de decisión con reglas de desempate distingue `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` y `revert`. |
-| 😀 **Los 75 gitmojis** | Cada gitmoji está ligado a los tipos en los que es válido, así que un 🐛 nunca acaba en un `feat`. |
+| 🌳 **Decide el tipo** | Diez preguntas de sí/no sobre las rutas modificadas y el diff, gana la primera, y distinguen `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` y `revert`. |
+| 😀 **Los 75 gitmojis** | Cada gitmoji pertenece a un solo tipo, y los pocos que admiten un segundo llevan escrita la condición literal que lo permite. El par se busca en el catálogo y se verifica antes de escribir el mensaje, así que un 🐛 nunca acaba en un `feat`. |
 | 📦 **Agrupa los cambios** | Divide lo pendiente en commits de una sola intención, en orden lógico. Los tests y la documentación van con el cambio al que pertenecen. |
 | 🔐 **Cuida lo que se sube** | Detecta tokens, claves, contraseñas y cadenas de conexión escritas en el código, y deja fuera los `.env`, las notas de sesión, los logs, los dumps y otros archivos sobrantes. Te dice qué dejó fuera y por qué. |
 | 🚫 **Sin firmas de IA** | Ni `Co-Authored-By` de herramientas de IA, ni «Generated with», ni 🤖. |
@@ -112,8 +112,8 @@ flowchart LR
 1. **Leer.** Ejecuta `git status`, las estadísticas del diff y los últimos 20 títulos, y busca reglas existentes (commitlint, `COMMIT_CONVENTION.md`, `CONTRIBUTING`).
 2. **Filtrar.** Un `git grep` busca secretos escritos en el código de los archivos modificados. Los archivos secretos por naturaleza y los sobrantes (notas de sesión, logs, temporales, comprimidos, configuración local) no se agregan al staging y se reportan.
 3. **Agrupar.** Una intención funcional por commit, el menor número de commits posible.
-4. **Tipo.** Recorre un árbol de decisión: revert → docs → test → ci → build → fix/feat → perf/style/refactor → chore.
-5. **Gitmoji.** Parte del gitmoji por defecto del tipo y lo cambia por uno específico solo si describe el commit completo.
+4. **Tipo.** Diez preguntas de sí/no en orden, gana el primer `sí`: revert → docs → test → ci → build → feat/fix → perf → style → refactor → chore.
+5. **Gitmoji.** Parte del gitmoji por defecto del tipo, busca al candidato en el catálogo y lo conserva solo si el tipo de esa fila coincide (o si su condición de excepción se cumple literalmente). El par se declara y se contrasta con la tabla antes de escribir el mensaje.
 6. **Idioma.** Por orden de prioridad: lo que pidas, luego el archivo de convención, luego el historial, luego el README y por último el idioma en que escribes.
 7. **Mensaje.** Un título que describe el cambio sin empezar con verbo y un cuerpo que explica el porqué y el impacto.
 8. **Commit.** Hace staging selectivo y commitea a través de un archivo UTF-8, para que los emojis lleguen intactos en cualquier sistema.
@@ -138,8 +138,8 @@ flowchart LR
 
 | Tipo | Por defecto | Semver | Cuándo |
 |---|---|---|---|
-| `feat` | ✨ | minor | Una capacidad nueva o un cambio intencional de comportamiento |
-| `fix` | 🐛 | patch | Algo que debía funcionar y no funcionaba |
+| `feat` | ✨ | minor | Alguien puede hacer algo que antes no podía |
+| `fix` | 🐛 | patch | Algo que debía funcionar y no funcionaba, o cualquier otro cambio en cómo se comporta algo que ya existe |
 | `refactor` | ♻️ | — | Código reorganizado, mismo comportamiento |
 | `perf` | ⚡️ | patch | Mismo comportamiento, más rápido o más ligero de forma medible |
 | `style` | 🎨 | — | Solo formato (nunca CSS/UI) |
@@ -160,7 +160,7 @@ Un cambio incompatible mantiene su tipo y añade 💥 y `!`:
 BREAKING CHANGE: los clientes deben leer los resultados del campo `items`.
 ```
 
-La lista completa de los 75 gitmojis, con los tipos en que vale cada uno, está en [references/gitmojis.md](references/gitmojis.md).
+El catálogo completo — cada gitmoji con su tipo único y, cuando existe, la condición de su único tipo alterno — está en [references/gitmojis.md](references/gitmojis.md).
 
 ## Ejemplos
 
@@ -225,7 +225,7 @@ El historial pertenece al proyecto y a quienes lo desarrollan. Las firmas de atr
 gitmoji-commits/
 ├── SKILL.md                       # el flujo que sigue el agente
 ├── references/
-│   ├── gitmojis.md                # los 75 gitmojis con sus tipos válidos (se lee solo si hace falta)
+│   ├── gitmojis.md                # los 75 gitmojis, un tipo cada uno (se lee solo si hace falta)
 │   └── convention-template.md     # solo se usa al documentar la convención
 ├── README.md
 ├── README.es.md

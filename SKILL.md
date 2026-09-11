@@ -93,52 +93,53 @@ If there is more than one group, show the plan as one line per commit (title and
 
 ## 4. Type
 
-Go through these in order. The first match wins.
+Ask these about the group being committed, in order. Each one is a yes/no question about the changed paths and the diff, never about how the change feels. **The first `yes` decides the type. Stop there.**
 
-1. It undoes an earlier commit → `revert`
-2. It only touches docs or code comments → `docs`
-3. It only touches tests, mocks, fixtures or snapshots → `test`
-4. It only touches CI/CD pipelines → `ci`
-5. It only touches the build system, packaging or dependencies → `build`
-6. Observable behavior changes:
-   - something was supposed to work and didn't (wrong result, crash, security hole) → `fix`
-   - a new capability, or an intentional change in behavior → `feat`
-7. Behavior stays identical:
-   - measurably faster or lighter → `perf`
-   - formatting only (whitespace, lint autofix, import order) → `style`
-   - restructured code (rename, extract, move, simplify, dead code removed) → `refactor`
-8. Anything else (config, tooling, `.gitignore`, releases) → `chore`
+1. Does the group undo an earlier commit? → `revert`
+2. Is *every* changed path documentation (`*.md`, `docs/`, API reference) or a comment inside code? → `docs`
+3. Is *every* changed path a test, mock, fixture or snapshot? → `test`
+4. Is *every* changed path a CI/CD pipeline file (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`)? → `ci`
+5. Is *every* changed path build, packaging or dependency (manifest, lockfile, bundler config, Dockerfile)? → `build`
+6. Does the diff change what a user or a caller can observe (output, screen, response, side effect)?
+   - 6a. Can someone now do something they could not do before this commit? → `feat`
+   - 6b. Otherwise → `fix`. This covers a defect *and* an intentional change to how something existing behaves, because neither adds a capability.
+7. Behavior is identical. Is it measurably faster or lighter? → `perf`
+8. Behavior is identical. Is the diff formatting only (whitespace, lint autofix, import order)? → `style`
+9. Behavior is identical. Is code restructured (rename, extract, move, simplify, dead code removed)? → `refactor`
+10. Nothing above matched (config, tooling, `.gitignore`, release, seeds, logs) → `chore`
 
-Tie-breakers:
+Rules that resolve the cases where two answers look true:
 
-- Something that never existed is `feat`, even when someone reported it as a bug.
-- A refactor that also fixes a bug should be split. If you can't separate them, use `fix`.
-- CSS/UI changes are `feat` or `fix`, never `style`. New UI is `✨ feat`; restyling or repairing existing UI is `💄 fix`.
-- `chore` is the last resort, not a catch-all.
-- **Breaking change** (removed or renamed API, incompatible contract or config): keep the type, use 💥 and `!`, and add a footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
+1. Steps 2–5 need *every* path to qualify. One production file in the group sends it to step 6.
+2. Step 6a is about capability, not size. A one-line option nobody had before is `feat`; a rewritten screen that does the same as before is `fix`.
+3. A refactor that also fixes a bug is two commits. If they cannot be separated, the group is `fix`.
+4. CSS/UI is never `style`. New UI is `✨ feat`; restyling or repairing existing UI is `💄 fix`.
+5. `chore` is step 10 because it is the last resort, never a catch-all.
+6. **Breaking change** (removed or renamed API, incompatible contract or config): the type stays whatever these steps produced. Use 💥 instead of that type's gitmoji, add `!` after the scope, and add the footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
 
 ## 5. Gitmoji
 
-Start from the type's default. Switch to a more specific gitmoji only when it describes the whole commit.
-The gitmoji and the type must be a valid pair. Look anything missing up in [references/gitmojis.md](references/gitmojis.md) (all 75, with their valid types).
+The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gitmojis.md) holds all 75, grouped by the one type each belongs to, and it is the only source of truth. Run these steps with the file open:
 
-**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. So `🚸 feat` or `💄 feat` announces a version bump the gitmoji does not carry. Whatever area a change touches, if it introduces something that did not exist it is `✨ feat`; the area-specific gitmojis are for changing something that already exists, which makes them `fix` (or `perf`, `refactor`, `chore`).
+1. **Default.** Take the default gitmoji of the type from section 4: `feat` ✨ · `fix` 🐛 · `refactor` ♻️ · `perf` ⚡️ · `style` 🎨 · `docs` 📝 · `test` ✅ · `build` 📦️ · `ci` 👷 · `chore` 🔧 · `revert` ⏪️.
+2. **Candidate.** Look through the catalog, starting with the section for that type. If one row's *Use for* describes the whole commit, it becomes the candidate, wherever in the file it lives. If no row does, keep the default and go to step 5.
+3. **Check the pair.** The candidate's *Type* must equal the type from section 4. If it does, use it.
+4. **Exception, or nothing.** If the candidate's *Type* differs, the pair is valid only when the row's *Exception* names your type **and** its condition is literally true for this diff. When it is not, discard the candidate and go back to the default of step 1.
+5. **Breaking change.** If the change breaks consumers, the gitmoji becomes 💥 and the header carries `!`. This replaces the result of the steps above.
 
-| Type | Default | Specific |
-|---|---|---|
-| feat | ✨ | — (only 💥 for a breaking change, with `!`) |
-| fix | 🐛 | 🚑️ critical hotfix · 🩹 minor fix · 🔒️ security · 🥅 error handling · ✏️ typo · 👽️ external API change · 🚨 warnings · 💄 UI · 🚸 UX · 📱 responsive · 💫 animations · 💬 texts · ♿️ a11y · 🌐 i18n · 🔍️ SEO · 📈 analytics · 🛂 roles/permissions · 👔 business logic · 🦺 validation · ✈️ offline · 🗃️ database · 🏷️ types · 🦖 backwards compatibility · 🍱 assets · 🩺 healthcheck |
-| refactor | ♻️ | 🏗️ architecture · 🚚 move/rename · 🔥 remove code · ⚰️ dead code · 🗑️ deprecation · 🏷️ types |
-| perf | ⚡️ | 🧵 concurrency · 🗃️ queries |
-| style | 🎨 | 🚨 lint warnings |
-| docs | 📝 | 💡 code comments · ✏️ typos · 📄 license · 👥 contributors |
-| test | ✅ | 🧪 failing test · 🤡 mocks · 📸 snapshots |
-| build | 📦️ | ⬆️ upgrade · ⬇️ downgrade · ➕ add dep · ➖ remove dep · 📌 pin · 🧱 infrastructure |
-| ci | 👷 | 💚 fix CI · 🚀 deploy |
-| chore | 🔧 | 🔨 dev scripts · 🙈 .gitignore · 🔖 release · 🎉 first commit · 🌱 seeds · 🔐 secrets setup · 🧑‍💻 DX · 🔊 🔇 logs · 🚩 feature flags · ⚗️ experiments · 💸 sponsorship/billing · 🥚 easter eggs |
-| revert | ⏪️ | — |
+**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. So `🚸 feat` or `💄 feat` announces a version bump the gitmoji does not carry. Whatever area a change touches, if it lets someone do something they could not do before it is `✨ feat`; every area gitmoji describes a change to something that already exists.
 
-Keep 🚧 💩 🍻 out of shared history.
+Two things are never allowed: a pair that the catalog does not list, and a gitmoji chosen from memory without opening the file. 🚧 💩 🍻 stay out of shared history.
+
+## 5b. Validate before writing the message
+
+For each commit, and before a single word of the message is written, confirm out loud, in one line:
+
+```
+<gitmoji> + <type> → row found in references/gitmojis.md, column Type = <type>  ✔
+```
+
+If the row's *Type* column does not literally contain the type, the pair is invalid: go back to section 5 and take the default. A commit is never created on a pair that was not read from the table in this session.
 
 ## 6. Language
 
@@ -235,7 +236,7 @@ If you have no file tool, run `git commit -m "<header>" -m "<paragraph>" -m "<pa
 
 Before each commit, check:
 
-- [ ] it holds one intent, the type matches the diff, and the gitmoji is valid for that type (a `feat` carries ✨, or 💥 with `!`)
+- [ ] it holds one intent, the type comes from the questions in section 4, and the pair passed the check in section 5b (a `feat` carries ✨, or 💥 with `!`)
 - [ ] the scope is a domain, and the title is a noun phrase in the repository's language that doesn't repeat the scope, with no leading verb and no trailing period
 - [ ] the body explains why and what the impact is, with no headings, file lists or AI credit
 - [ ] nothing staged contains a secret, a session note or a temporary file
