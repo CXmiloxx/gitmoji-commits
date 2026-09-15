@@ -112,7 +112,11 @@ flowchart LR
 1. **Leer.** Ejecuta `git status`, las estadísticas del diff y los últimos 20 títulos, y busca reglas existentes (commitlint, `COMMIT_CONVENTION.md`, `CONTRIBUTING`).
 2. **Filtrar.** Un `git grep` busca secretos escritos en el código de los archivos modificados. Los archivos secretos por naturaleza y los sobrantes (notas de sesión, logs, temporales, comprimidos, configuración local) no se agregan al staging y se reportan.
 3. **Agrupar.** Una intención funcional por commit, el menor número de commits posible.
-4. **Tipo.** Diez preguntas de sí/no en orden, gana el primer `sí`: revert → docs → test → ci → build → feat/fix → perf → style → refactor → chore.
+4. **Tipo.** Diez preguntas de sí/no en orden, gana el primer `sí`: revert → docs → test → ci → build → feat/fix/chore → perf → style → refactor → chore.
+   - `feat` ✨: Nueva capacidad.
+   - `fix` 🐛 + área: Algo estaba roto (🐛, 🚑️, 🔒️); o funcionaba pero cambió intencionalmente (👔 reglas de negocio, 💄 UI, 🚸 usabilidad, etc.). El gitmoji de área señala *qué* cambió.
+   - `refactor` ♻️: Código reorganizado, mismo comportamiento.
+   - Otros tipos: perf, style, docs, test, build, ci, chore, revert.
 5. **Gitmoji.** Parte del gitmoji por defecto del tipo, busca al candidato en el catálogo y lo conserva solo si el tipo de esa fila coincide (o si su condición de excepción se cumple literalmente). El par se declara y se contrasta con la tabla antes de escribir el mensaje.
 6. **Idioma.** Por orden de prioridad: lo que pidas, luego el archivo de convención, luego el historial, luego el README y por último el idioma en que escribes.
 7. **Mensaje.** Un título que describe el cambio sin empezar con verbo y un cuerpo que explica el porqué y el impacto.
@@ -128,10 +132,10 @@ flowchart LR
 
 | Parte | Regla |
 |---|---|
-| **gitmoji** | Válido para el tipo. Se usa el carácter del emoji, salvo que el repo use `:shortcodes:`. |
+| **gitmoji** | Válido para el tipo. Señala qué dominio/aspecto cambió. Se usa el carácter del emoji, salvo que el repo use `:shortcodes:`. |
 | **tipo** | Uno de los 11 tipos de abajo, siempre en inglés y en minúsculas. |
-| **scope** | Un dominio en minúsculas: `auth`, `checkout`, `pedidos`. Nunca un archivo, una clase ni un componente. |
-| **título** | Qué cambió, sin empezar con verbo, sin punto final y sin repetir el scope. Unos 72 caracteres para toda la cabecera. |
+| **scope** | Un dominio en minúsculas: `auth`, `checkout`, `pedidos`. Nunca un archivo, una clase ni un componente. Debe coincidir con los scopes existentes en el historial. |
+| **título** | Qué cambió, sin empezar con verbo, sin punto final y sin repetir el scope. Unos 50 caracteres ideales; máximo 72. |
 | **cuerpo** | Qué cambió, por qué y qué impacto tiene, en prosa. En cambios grandes se admite una lista corta de comportamientos. |
 
 ### Tipos
@@ -139,10 +143,10 @@ flowchart LR
 | Tipo | Por defecto | Semver | Cuándo |
 |---|---|---|---|
 | `feat` | ✨ | minor | Alguien puede hacer algo que antes no podía |
-| `fix` | 🐛 | patch | Algo que debía funcionar y no funcionaba, o cualquier otro cambio en cómo se comporta algo que ya existe |
-| `refactor` | ♻️ | — | Código reorganizado, mismo comportamiento |
+| `fix` | 🐛 + área | patch | Algo estaba roto, o funcionaba pero cambió intencionalmente (reglas de negocio 👔, UI 💄, usabilidad 🚸, validación 🦺, etc.) |
+| `refactor` | ♻️ | — | Código reorganizado sin cambiar el comportamiento |
 | `perf` | ⚡️ | patch | Mismo comportamiento, más rápido o más ligero de forma medible |
-| `style` | 🎨 | — | Solo formato (nunca CSS/UI) |
+| `style` | 🎨 | — | Solo formato (espacios, orden de imports, autofix de linter) |
 | `docs` | 📝 | — | Documentación y comentarios de código |
 | `test` | ✅ | — | Tests, mocks, fixtures, snapshots |
 | `build` | 📦️ | — | Sistema de build, empaquetado, dependencias |
@@ -150,7 +154,7 @@ flowchart LR
 | `chore` | 🔧 | — | Mantenimiento que no encaja en otro tipo |
 | `revert` | ⏪️ | patch | Deshace un commit anterior |
 
-`feat` siempre lleva ✨. En el catálogo oficial solo ✨ es `minor` y solo 💥 es `major`, así que un gitmoji `patch` como 🚸 o 💄 en un `feat` anuncia un salto de versión que ese gitmoji no tiene. Los gitmojis de área describen un cambio sobre algo que ya existe, y eso cae en `fix`, `perf`, `refactor` o `chore`.
+**Por qué `fix` lleva gitmojis de área:** Un cambio a reglas de negocio (👔), estilo de UI (💄) o validación (🦺) no es un arreglo de bug — es un cambio intencional. El gitmoji señala *qué* cambió; el tipo `fix` señala *por qué* existe (algo no funcionaba bien, o cambió la política). Esto publica en el changelog y dispara un salto de versión en herramientas como `semantic-release`.
 
 Un cambio incompatible mantiene su tipo y añade 💥 y `!`:
 

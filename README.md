@@ -111,7 +111,11 @@ flowchart LR
 1. **Read.** It runs `git status`, the diff stats, the last 20 commit subjects, and looks for existing rules (commitlint, `COMMIT_CONVENTION.md`, `CONTRIBUTING`).
 2. **Filter.** One `git grep` looks for hardcoded secrets in the changed files. Files that are secret by nature and leftovers (session notes, logs, temporary files, archives, local settings) stay unstaged and are reported.
 3. **Group.** One functional intent per commit, as few commits as possible.
-4. **Type.** Ten yes/no questions in order, the first `yes` wins: revert → docs → test → ci → build → feat/fix → perf → style → refactor → chore.
+4. **Type.** Ten yes/no questions in order, the first `yes` wins: revert → docs → test → ci → build → feat/fix/chore → perf → style → refactor → chore.
+   - `feat` ✨: New capability.
+   - `fix` 🐛 + area: Something was broken (🐛, 🚑️, 🔒️); or working but intentionally changed (👔 business rules, 💄 UI, 🚸 usability, etc.). Area gitmoji signals what changed.
+   - `refactor` ♻️: Code restructured, behavior identical.
+   - Other types: perf, style, docs, test, build, ci, chore, revert.
 5. **Gitmoji.** It starts from the type's default, looks the candidate up in the catalog, and keeps it only if the row's type matches (or its exception condition is literally true). The pair is stated and checked against the table before the message is written.
 6. **Language.** In order of priority: what you ask for, then the convention file, then the history, then the README, then the language you write in.
 7. **Message.** A noun-phrase title and a body that explains why and what the impact is.
@@ -127,10 +131,10 @@ flowchart LR
 
 | Part | Rule |
 |---|---|
-| **gitmoji** | Valid for the type. The emoji character is used unless the repository uses `:shortcodes:`. |
+| **gitmoji** | Valid for the type. Signals what domain/aspect changed. The emoji character is used unless the repository uses `:shortcodes:`. |
 | **type** | One of the 11 types below, always in English and lowercase. |
-| **scope** | One domain in lowercase: `auth`, `checkout`, `orders`. Never a file, class or component. |
-| **title** | What changed, as a noun phrase. No leading verb, no trailing period, and the scope is not repeated. About 72 characters for the whole header. |
+| **scope** | One domain in lowercase: `auth`, `checkout`, `orders`. Never a file, class or component. Must match existing scopes in history. |
+| **title** | What changed, as a noun phrase. No leading verb, no trailing period, and the scope is not repeated. ~50 chars ideal; max 72. |
 | **body** | What changed, why, and what the impact is, in prose. A short list of behaviors is allowed for large changes. |
 
 ### Types
@@ -138,16 +142,18 @@ flowchart LR
 | Type | Default | Semver | When |
 |---|---|---|---|
 | `feat` | ✨ | minor | Someone can now do something they could not do before |
-| `fix` | 🐛 | patch | Something that was supposed to work and didn't, or any other change to how something existing behaves |
-| `refactor` | ♻️ | — | Code restructured, behavior identical |
+| `fix` | 🐛 + area | patch | Something was broken, or working but intentionally changed (business rules 👔, UI 💄, usability 🚸, validation 🦺, etc.) |
+| `refactor` | ♻️ | — | Code restructured without changing behavior |
 | `perf` | ⚡️ | patch | Same behavior, measurably faster or lighter |
-| `style` | 🎨 | — | Formatting only (never CSS/UI) |
+| `style` | 🎨 | — | Formatting only (whitespace, import order, lint autofix) |
 | `docs` | 📝 | — | Documentation and code comments |
 | `test` | ✅ | — | Tests, mocks, fixtures, snapshots |
 | `build` | 📦️ | — | Build system, packaging, dependencies |
 | `ci` | 👷 | — | CI/CD pipelines |
 | `chore` | 🔧 | — | Maintenance that fits nowhere else |
 | `revert` | ⏪️ | patch | Undoes an earlier commit |
+
+**Why `fix` carries area gitmojis:** A change to business rules (👔), UI style (💄), or validation (🦺) is not a bug repair—it's an intentional change. The gitmoji signals *what* changed; the type `fix` signals *why* it exists (something wasn't working right, or policy changed). This publishes in the changelog and triggers a version bump via release tools like `semantic-release`.
 
 `feat` always carries ✨. In the official catalog only ✨ is `minor` and only 💥 is `major`, so a `patch` gitmoji such as 🚸 or 💄 on a `feat` announces a version bump it does not carry. Area-specific gitmojis describe a change to something that already exists, which lands on `fix`, `perf`, `refactor` or `chore`.
 
