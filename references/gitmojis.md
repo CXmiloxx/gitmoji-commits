@@ -25,8 +25,23 @@ All 75 gitmojis. This file is the only source of truth for which type a gitmoji 
 | 🔒️ | `:lock:` | fix | — | Closing a security or privacy hole: injection, leaked data, missing auth check, unsafe defaults. |
 | 🩹 | `:adhesive_bandage:` | fix | — | Small, non-critical fix: an edge case, a minor glitch. |
 | 🥅 | `:goal_net:` | fix | — | Catching and handling errors that previously escaped. |
+| 👔 | `:necktie:` | fix | — | Business rules and domain logic: calculation was wrong, policy updated, workflow changed. Whether the fix repairs a calculation or intentionally changes it per policy. |
+| 💄 | `:lipstick:` | fix | — | Visual change to UI: styles, themes, colors, layout, spacing. Broken styles (broken on mobile, dark mode) or restyling. |
+| 🚸 | `:children_crossing:` | fix | — | Usability improvements: fewer steps, clearer text, better feedback to user. |
+| 📱 | `:iphone:` | fix | — | Responsive design and mobile layouts. Broken on mobile or improved responsive design. |
+| 💫 | `:dizzy:` | fix | — | Animations and transitions. New or fixed animations. |
+| 💬 | `:speech_balloon:` | fix | — | User-facing text, copy, messages or literals. Typo or improved messaging. |
+| ♿️ | `:wheelchair:` | fix | — | Accessibility: keyboard navigation, ARIA, contrast, screen-reader support. |
+| 🌐 | `:globe_with_meridians:` | fix | — | Translations, locales, date/number formatting per locale. |
+| 🔍️ | `:mag:` | fix | — | SEO: meta tags, sitemaps, structured data, indexability. |
+| 📈 | `:chart_with_upwards_trend:` | fix | — | Analytics, tracking events, metrics instrumentation. |
+| 🛂 | `:passport_control:` | fix | — | Authorization and permissions: new roles, changed access rules. |
+| 🦺 | `:safety_vest:` | fix | — | Input validation and data validation rules. New or changed validation. |
+| ✈️ | `:airplane:` | fix | — | Offline support, caching for offline use, sync on reconnect. |
+| 👽️ | `:alien:` | fix | — | Adapting to a change in an external API or third-party service. |
 | 🗃️ | `:card_file_box:` | fix | `perf` if the only goal is speed (index, query plan, fewer round trips) | Database changes: schema, migrations, indexes, queries whose essence is the data layer. |
 | 🧵 | `:thread:` | fix | `perf` if the commit makes it measurably faster or lighter | Concurrency, multithreading, async coordination, locks, queues. |
+| 🦖 | `:t-rex:` | fix | `refactor` if behavior for current clients is identical | Backwards compatibility: shims, polyfills, keeping old clients working. |
 
 ## refactor
 
@@ -39,21 +54,6 @@ All 75 gitmojis. This file is the only source of truth for which type a gitmoji 
 | 🏷️ | `:label:` | refactor | `fix` if the wrong typing let a real defect through | Type definitions and typings (TypeScript types, interfaces, schemas for types). |
 | 🔥 | `:fire:` | refactor | `chore` if every removed path is config, tooling or an asset | Removing code or files that are no longer needed. Removing a public capability is a breaking change: use 💥 instead. |
 | 🚚 | `:truck:` | refactor | `chore` if only config, docs or asset paths moved | Moving or renaming files, folders, routes or modules. |
-| 👔 | `:necktie:` | refactor | — | Business rules and domain logic: changing calculations, policies, workflows of the domain. **use when step 6c applies** |
-| 💄 | `:lipstick:` | refactor | `fix` if repairing broken styles | Visual changes to existing UI: styles, themes, colors, layout, spacing, fonts. |
-| 🚸 | `:children_crossing:` | refactor | — | Usability improvements: fewer steps, clearer wording, better feedback to user. |
-| 💬 | `:speech_balloon:` | refactor | — | Changing user-facing text, copy, messages or literals that already exist. |
-| 🛂 | `:passport_control:` | refactor | — | Authorization, roles and permissions: adding new roles, changing access rules. |
-| 🦺 | `:safety_vest:` | refactor | — | Input validation and data validation rules: new validation checks, changing existing rules. |
-| ✈️ | `:airplane:` | refactor | — | Offline support, caching for offline use, sync on reconnect. |
-| 👽️ | `:alien:` | refactor | — | Adapting to a change in an external API or third-party service. |
-| 🦖 | `:t-rex:` | refactor | — | Backwards compatibility: shims, polyfills, keeping old clients working. |
-| 📱 | `:iphone:` | refactor | — | Responsive design and mobile layouts. |
-| 💫 | `:dizzy:` | refactor | — | Animations and transitions. |
-| ♿️ | `:wheelchair:` | refactor | — | Accessibility: keyboard navigation, ARIA, contrast, screen-reader support. |
-| 🌐 | `:globe_with_meridians:` | refactor | — | Translations, locales, date/number formatting per locale. |
-| 🔍️ | `:mag:` | refactor | — | SEO: meta tags, sitemaps, structured data, indexability. |
-| 📈 | `:chart_with_upwards_trend:` | refactor | — | Analytics, tracking events, metrics instrumentation. |
 
 ## perf
 

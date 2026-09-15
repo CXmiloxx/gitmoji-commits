@@ -4,7 +4,7 @@ description: 'Writes git commits with gitmoji and Conventional Commits (`<gitmoj
 license: MIT
 metadata:
   author: CXmiloxx
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Gitmoji Commits
@@ -39,7 +39,7 @@ From that output, settle four things without writing them down:
 - **Existing rules.** If the last command lists files, read only their commit section. They override this skill, and commits must pass any commitlint or hook config.
 - **Language.** See section 6.
 - **Scopes.** Reuse the ones in history. For a new area, name the module or domain.
-- **Emoji style.** Write the character (`✨`) unless history uses shortcodes (`:sparkles:`). If history consistently uses its own emoji for a type (for example `📚` for docs), keep it.
+- **Emoji style.** Write the character (`✨`) unless history uses shortcodes (`:sparkles:`). If history consistently uses its own emoji for a type (for example `📚` for docs), keep it. If a type has a custom emoji in history, keep using that emoji.
 
 Then read the changes themselves: `git diff`, `git diff --cached`, and any untracked files. For a large diff, read one path at a time with `git diff -- <path>`. For an untracked folder (`git status` shows `folder/`), list what's inside with `git status --short -uall -- <folder>`.
 
@@ -71,6 +71,7 @@ When you find a secret:
 **Leftovers** are new files that don't belong to the change:
 
 - **Session notes** left behind by a person or an agent: Markdown plans, summaries, reports, TODO lists or scratch files (`PLAN.md`, `NOTES.md`, `SUMMARY.md`, `TODO.md`, `*-notes.md`, `scratch*`…). Treat one as a leftover when nothing in the project links to it and it reads like working notes rather than documentation.
+- **Instruction files** that are the product, not documentation: `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, rules read by an agent, templates. Their changes go to step 4 (type decision), not `docs`.
 - **Temporary or generated files:**
   - logs and temp files: `*.log`, `*.tmp`, `*.bak`, `*.orig`, `*.rej`, `*.swp`, `*~`
   - OS files: `.DS_Store`, `Thumbs.db`
@@ -78,6 +79,7 @@ When you find a secret:
   - build output: `dist/`, `build/`, `coverage/`
   - dependency folders: `node_modules/`, `.venv/`
 - **Personal settings:** `*.local.*`, `.claude/settings.local.json`, and editor folders (`.idea/`, `.vscode/`) unless the repository already versions them.
+- **Paths excluded by the user** (e.g., "only code, not docs"). Treat as leftovers and list them at the end.
 
 Don't stage leftovers, and never delete them. List them in one line at the end. If they keep showing up, offer a separate `🙈 chore` commit that adds them to `.gitignore`.
 
@@ -91,157 +93,70 @@ Don't stage leftovers, and never delete them. List them in one line at the end. 
 
 If there is more than one group, show the plan as one line per commit (title and files), then proceed.
 
+**Handling mixed changes in one file:** If one file has changes for different intents, extract the relevant hunks manually. Generate the diff with context (`-U3` or `-U1 --inter-hunk-context=0`), apply hunks selectively to a copy of the original, verify the copy (structure intact), then stage via `git update-index --cacheinfo` without touching the working tree. Never use `--unidiff-zero` to insert lines without context.
+
 ## 4. Type
 
 Ask these about the group being committed, in order. Each one is a yes/no question about the changed paths and the diff, never about how the change feels. **The first `yes` decides the type. Stop there.**
 
-**Quick reference: most common types**
-
-| If the diff… | Type | Example |
-|---|---|---|
-| Adds new capability | `feat` | User can now export reports; new login method |
-| Fixes broken behavior | `fix` | Button click now works; query returns correct result |
-| Changes existing rule/behavior intentionally | `refactor` | Discount formula changed; payment due date calculation adjusted |
-| Only tests, docs, or config | `test`, `docs`, `build`, `chore` | Add unit tests; write README; update tsconfig |
-| Same behavior, measurably faster | `perf` | Caching added; query plan optimized |
-| Code moves/renames, behavior unchanged | `refactor` | Extract function; rename module; reorganize imports |
-
 1. Does the group undo an earlier commit? → `revert`
-2. Is *every* changed path documentation (`*.md`, `docs/`, API reference) or a comment inside code? → `docs`
-3. Is *every* changed path a test, mock, fixture or snapshot? → `test`
-4. Is *every* changed path a CI/CD pipeline file (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`)? → `ci`
-5. Is *every* changed path build, packaging or dependency (manifest, lockfile, bundler config, Dockerfile)? → `build`
-6. Does the diff change what a user or a caller can observe (output, screen, response, side effect)?
-   - 6a. Can someone now do something they could not do before this commit? → `feat`
-      - *Examples:* new endpoint, new command, new UI button, new filter option, new validation rule
-      - *Not feat:* fixing a button that was broken, changing an existing filter, adapting to API change
-   - 6b. Does it repair something that was broken or working incorrectly (a defect)? → `fix`
-      - *Examples:* wrong calculation result, missing data, broken flow, API returning null, button not clickable
-      - *Not fix:* intentional change to a formula, updating a policy, adjusting due date logic
-   - 6c. Does it change existing rules, logic or behavior intentionally (no new capability, not a bug)? → `refactor`
-      - *Examples:* change discount formula, adjust payment due dates, adapt to external API change, improve usability flow, add new validation rule
-      - *Not refactor:* fixing a crash, repairing broken feature
+
+2. Is *every* changed path documentation (`*.md` for user-facing docs, `docs/`, API reference) or a comment inside code?
+   - Yes → `docs`
+   - *Example:* README update, API docs, inline docblock. Not: `SKILL.md` (instruction file).
+
+3. Is *every* changed path a test, mock, fixture or snapshot?
+   - Yes → `test`
+   - *Example:* `test_*.py`, mocks, fixtures. Not: production code with tests added.
+
+4. Is *every* changed path a CI/CD pipeline file (`.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`)?
+   - Yes → `ci`
+   - *Example:* GitHub workflow added. Not: script called by CI.
+
+5. Is *every* changed path build, packaging or dependency (manifest, lockfile, bundler config, Dockerfile)?
+   - Yes → `build`
+   - *Example:* `package.json`, `Dockerfile`, `pyproject.toml`. Not: test runner config (→ `chore`).
+
+6. Does the diff change what a user or caller can observe (output, screen, response, side effect)?
+   - 6a. Can someone now do something they could not do before? → `feat`
+      - *Example:* new endpoint, new command, new filter, new validation rule, new capability.
+   - 6b. Is something that was broken or working incorrectly now fixed? → `fix` (with area gitmoji if it matches)
+      - *Examples of `fix`*: button didn't respond now does; calculation was wrong now correct; data was lost now persists.
+      - *Examples of `fix` + area gitmoji*: changed business rule (👔 fix), restyled UI (💄 fix), improved flow (🚸 fix), adapted to API change (👽️ fix).
+      - *Rule:* Gitmoji describes *what area* changed, type describes *why* (it was broken and we fixed it, or we intentionally changed it per policy). Consult [references/gitmojis.md](references/gitmojis.md) "Use for" to match.
+   - 6c. Does nothing else apply? → `chore` (config, tooling, release, seeds, logs).
+
 7. Behavior is identical. Is it measurably faster or lighter? → `perf`
+
 8. Behavior is identical. Is the diff formatting only (whitespace, lint autofix, import order)? → `style`
-9. Behavior is identical. Is code restructured (rename, extract, move, simplify, dead code removed)? → `refactor`
-10. Nothing above matched (config, tooling, `.gitignore`, release, seeds, logs) → `chore`
 
-Rules that resolve the cases where two answers look true:
+9. Behavior is identical. Is code restructured (extract, rename, move, simplify, dead code removed)? → `refactor`
 
-1. Steps 2–5 need *every* path to qualify. One production file in the group sends it to step 6.
-2. Step 6a is about capability, not size. A one-line option nobody had before is `feat`; a rewritten screen that does the same as before is `refactor`.
-3. Step 6b is for actual defects: behavior that broke, crashes, wrong results, missing features that should have worked.
-   - `fix`: "Button didn't work and now does" / "Calculation had a bug and now is correct" / "Data was lost and now persists"
-   - `refactor` (6c): "Button behavior changed intentionally" / "Calculation formula updated per new policy" / "Discount logic rewritten"
-   - **Rule of thumb:** If you're answering "that worked, but we're changing how it works," it's `refactor`. If "that didn't work, now it does," it's `fix`.
-4. A refactor that also fixes a bug is two commits. If they cannot be separated, the group is `fix`.
-5. CSS/UI is never `style`. New UI is `✨ feat`; restyling, changing colors or layout of existing UI is `♻️ refactor`; repairing broken styles is `💄 fix`.
-6. `chore` is step 10 because it is the last resort, never a catch-all.
-7. **Breaking change** (removed or renamed API, incompatible contract or config): the type stays whatever these steps produced. Use 💥 instead of that type's gitmoji, add `!` after the scope, and add the footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
+10. Nothing matched? → `chore` (last resort, never a catch-all).
 
-### 4a. Ambiguous cases
+**Rules resolving ties:**
 
-These appear in many codebases. Decide by asking: *was this broken and now works, or did we intentionally change working behavior?*
-
-**Database schema or migration**
-- `fix`: Migration fixes data corruption or missing data (e.g., populates null values that should have been filled)
-- `refactor`: Migration adds new columns, restructures tables, or changes data format for new feature
-
-**API integration or third-party service**
-- `fix`: API we integrate with had a bug and we worked around it; now they fixed it and we remove the workaround
-- `refactor`: External API changed its format or behavior; we adapt our code to the new contract
-
-**Validation or business rules**
-- `fix`: Validation was missing and payments were processing with invalid data (now they reject invalid)
-- `refactor`: Validation rule changed per new policy (e.g., minimum purchase amount raised)
-
-**UI or visual**
-- `fix`: Button was unclickable, text was invisible, layout was broken on mobile; now it works
-- `refactor`: We restyled buttons, changed colors, improved spacing, or redesigned a form (same function, new look)
-
-**Performance without observable change**
-- `perf`: Code is faster but output and behavior identical to before
-- `refactor`: We change how caching works, or restructure data fetching (behavior same, but internal design changes)
-
-**Accessibility or usability flow**
-- `fix`: Users couldn't use a feature due to missing keyboard support or broken screen reader
-- `refactor`: We improve the flow (fewer clicks, clearer labels, better feedback) but feature already worked
-
-### 4b. Real commit examples
-
-**✨ feat: new capability**
-```
-✨ feat(checkout): one-click payment with saved cards
-
-Users can now check out with a previously saved card without re-entering
-details. Reduces cart abandonment on mobile.
-```
-
-**🐛 fix: defect repair**
-```
-🐛 fix(cart): total calculation includes all discounts
-
-Percentage coupons applied after fixed-amount ones calculated on original
-price instead of reduced price. Customers were charged incorrectly.
-```
-
-**♻️ refactor: intentional behavior change**
-```
-♻️ refactor(billing): payment due date calculated from invoice, not order
-
-Previously due 30 days from order. Now due 30 days from invoice date to
-align with accounting period. Gives customers more time to pay.
-```
-
-**📚 docs: documentation**
-```
-📚 docs(api): add webhook retry policy to reference
-
-Webhooks retry 5 times with exponential backoff. Previously only mentioned
-in comments.
-```
-
-**⚡️ perf: measurably faster, same behavior**
-```
-⚡️ perf(orders): cache product catalog in-memory
-
-Catalog query eliminated on every order. Response time 200ms → 5ms.
-```
+1. Steps 2–5 need *every* path to qualify. One production or instruction file sends it to step 6.
+2. Step 6a is about capability, not size. A one-line option nobody had is `feat`; a rewritten screen doing the same is `refactor` or `style`.
+3. Breaking change (removed/renamed API, incompatible contract/config): type stays as above, gitmoji becomes 💥, add `!` after scope and `BREAKING CHANGE:` footer.
 
 ## 5. Gitmoji
 
-The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gitmojis.md) holds all 75, grouped by the one type each belongs to, and it is the only source of truth. Run these steps with the file open:
+The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gitmojis.md) holds all 75, grouped by type, and is the only source of truth. Run these steps with the file open:
 
 1. **Default.** Take the default gitmoji of the type from section 4: `feat` ✨ · `fix` 🐛 · `refactor` ♻️ · `perf` ⚡️ · `style` 🎨 · `docs` 📝 · `test` ✅ · `build` 📦️ · `ci` 👷 · `chore` 🔧 · `revert` ⏪️.
-2. **Candidate.** Look through the catalog, starting with the section for that type. If one row's *Use for* describes the whole commit, it becomes the candidate, wherever in the file it lives. If no row does, keep the default and go to step 5.
+
+2. **Candidate.** Look through the catalog, starting with the section for that type. If one row's *Use for* column describes the whole commit, it becomes the candidate. If none does, keep the default.
+
 3. **Check the pair.** The candidate's *Type* must equal the type from section 4. If it does, use it.
-4. **Exception, or nothing.** If the candidate's *Type* differs, the pair is valid only when the row's *Exception* names your type **and** its condition is literally true for this diff. When it is not, discard the candidate and go back to the default of step 1.
-5. **Breaking change.** If the change breaks consumers, the gitmoji becomes 💥 and the header carries `!`. This replaces the result of the steps above.
 
-**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. Whatever area a change touches, if it lets someone do something they could not do before it is `✨ feat`. Gitmojis below it describe changes to things that already exist, so they can never be feat.
+4. **Exception, or nothing.** If the candidate's *Type* differs, the pair is valid only when the row's *Exception* names your type **and** the condition is literally true for this diff. When not, discard and go back to the default.
 
-Two things are never allowed: a pair that the catalog does not list, and a gitmoji chosen from memory without opening the file. 🚧 💩 🍻 stay out of shared history.
+5. **Breaking change.** If the change breaks consumers, gitmoji becomes 💥 and header carries `!`. This replaces the steps above.
 
-### 5a. When to use specialized gitmojis (instead of defaults)
+**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level. Only ✨ is `minor` (for `feat`), only 💥 is `major`; the rest are `patch` or `null`. Whatever area a change touches, if it adds capability, it is `✨ feat`.
 
-Most commits use the default gitmoji. Specialized ones describe *what* the commit changes, not the type. Use only when the "Use for" row matches *exactly*.
-
-**🐛 fix (default) vs specialized fix gitmojis:**
-- 🚑️ `:ambulance:` - only if critical production outage (data loss, downtime). Everything else is 🐛
-- 🔒️ `:lock:` - only if closing a security hole (injection, auth bypass, leaked data)
-- 🩹 `:adhesive_bandage:` - only if tiny, non-critical edge case. Prefer 🐛 when unsure
-- Example: Button click fixed = 🐛. Button click on mobile fixed = 🩹 if truly minor. Data calculation fixed = 🐛.
-
-**♻️ refactor (default) vs specialized refactor gitmojis:**
-- 👔 `:necktie:` - only if changing business rules/calculations/policies (discount formula, due date logic)
-- 💄 `:lipstick:` - only if visual UI change (restyling, colors, spacing, fonts). Never for CSS bug fix.
-- 🚸 `:children_crossing:` - only if improving usability (fewer steps, clearer text, better feedback)
-- 🛂 `:passport_control:` - only if adding/changing authorization rules or roles
-- 🦺 `:safety_vest:` - only if adding/changing validation rules
-- 👽️ `:alien:` - only if adapting to external API change
-- Example: Change button color = 💄. Fix button visual bug = 🐛. Improve form flow = 🚸.
-
-**Rule: When in doubt, use the default.** Specialized gitmojis should be obvious from the commit diff.
+Two things are never allowed: a pair not in the catalog, and a gitmoji chosen from memory without opening the file. 🚧 💩 🍻 stay out of shared history.
 
 ## 5b. Validate before writing the message
 
@@ -279,71 +194,40 @@ Translate one of them only if the user asks you to. Everyday words are still tra
 <body>
 ```
 
-**Scope** is one lowercase domain: `auth`, `checkout`, `orders`, `notifications`. Never a file, component, class, route or variable name.
+**Scope** is one lowercase domain: `auth`, `checkout`, `orders`, `notifications`. Never a file, component, class, route or variable name. Scope must match existing scopes in the repository's history.
 
-**Title** is the most important part. It answers "what changed?" as a noun phrase, the way you'd tell a colleague in one sentence.
+**Title** is a noun phrase answering "what changed?" the way you'd tell a colleague in one sentence.
 
-- Don't open with a verb, in any tense or language: *add, added, fixes, agregar, agrega, ajouter, adicionar, hinzufügen*…
-- Avoid both extremes: too technical (class names, libraries, algorithms) and too abstract ("improved experience", "flexible architecture").
-- Start lowercase unless history capitalizes or the language requires it (German nouns). No trailing period. Keep the header to about 72 characters, or whatever length history uses.
-- Don't repeat the scope. The scope already says where the change happened; the title says what changed there.
-- Describe the change you actually made, not the entire feature it belongs to.
+- Don't open with a verb: *add, added, fixes, agregar, agrega, ajouter, adicionar, hinzufügen*…
+- Concrete, not abstract. "sign-in with Google", not "improved auth"; "faster history for large accounts", not "performance improvement".
+- Start lowercase unless history capitalizes or language requires it (German nouns). No trailing period.
+- ~50 characters ideal; max 72 (or whatever length history uses).
+- Don't repeat the scope.
+- Describe the change you made, not the entire feature.
 
-**What makes a good title**
-- Specific: says exactly what changed, not how
-- Backward-compatible: someone reading it 6 months later understands the intent
-- Short: one sentence, about 50 characters ideal
-- Searchable: uses domain terms, not library names
+**Title examples: ✅ vs ❌**
 
-**Anti-patterns to avoid**
-
-| ❌ Bad | Problem |
-|---|---|
-| `fix(auth): bug` | No detail, meaningless |
-| `feat(app): lots of stuff` | Too vague, multiple intents |
-| `refactor: stuff` | No scope, no specificity |
-| `perf: faster queries` | Says what but not why or what impact |
-| `✨ feat(api): added authentication` | Starts with verb |
-| `fix(UserService.ts): validate email` | File name as scope, not domain |
-| `refactor(index.js): cleanup` | Abstract, says nothing real |
-| `chore: updated dependencies` | Should list what changed |
-
-| ❌ | ✅ | Why |
+| ❌ | ✅ | |
 |---|---|---|
-| `✨ feat(auth): add Google login` | `✨ feat(auth): sign-in with Google accounts` | no leading verb |
-| `🐛 fix(LoginForm.tsx): Fixed bug.` | `🐛 fix(auth): sessions closed after a password change` | domain scope, says which bug, no period |
-| `♻️ refactor: improvements` | `♻️ refactor(orders): totals calculated in one place` | concrete, not abstract |
-| `⚡️ perf(orders): Redis cache in OrderService` | `⚡️ perf(orders): faster history for large accounts` | the effect, not the implementation |
-| `✨ feat(dashboard): new dashboard charts` | `✨ feat(dashboard): monthly sales by category` | the scope is not repeated |
-
-Any language works the same way: `🐛 fix(carrito): total correcto con cupones combinados` · `♻️ refactor(panier): calcul des remises dans un seul service` · `⚡️ perf(relatorios): exportação sem bloquear a interface` · `✨ feat(suche): Filter nach Preis und Marke`.
-
-**More title examples across languages**
-
-| ❌ | ✅ | Language |
-|---|---|---|
-| `feat(auth): add Facebook` | `feat(auth): sign-in with Facebook` | English |
-| `fix(checkout): totals fixed` | `fix(checkout): correct total with stacked coupons` | English |
-| `refactor: mejorado` | `refactor(billing): due date from invoice, not order` | Spanish |
-| `feat(carrito): new feature` | `feat(carrito): save cart for later` | Spanish/English |
-| `fix(paiement): bug prix` | `fix(paiement): TVA appliquée sur prix réduit` | French |
-| `perf: rapide` | `perf(search): index queries without blocking UI` | French/English |
-| `refactor: cleanupCode` | `refactor(auth): extract token validation to helper` | English |
-| `chore: update stuff` | `chore(deps): upgrade React to 18.2` | English |
+| `fix(auth): bug` | `fix(auth): sessions closed after password change` | Specific, says which bug |
+| `feat(api): add authentication` | `feat(api): sign-in with Google accounts` | Noun phrase, no verb |
+| `perf(orders): Redis cache in OrderService` | `perf(orders): faster history for large accounts` | Effect, not implementation |
+| `refactor: improvements` | `refactor(checkout): address validator extracted` | Domain scope, concrete |
+| `chore: updated dependencies` | `chore(deps): upgrade React to v18.2` | Specific, not vague |
 
 **Body** says what changed, why, and what the impact is, in prose. Skip it only for trivial commits (typo, formatting, dependency bump).
 
-A small change gets one or two paragraphs:
+A small change:
 
 ```
-🐛 fix(checkout): accurate total with stacked coupons
+🐛 fix(checkout): correct total with stacked coupons
 
 A percentage coupon applied after a fixed-amount one discounted the
-original price instead of the reduced one, so customers paid less than
-expected. Discounts now apply in sequence.
+original price instead of the reduced one, so customers were charged less
+than expected. Discounts now apply in sequence.
 ```
 
-A large change across related areas may add a short list of *behaviors*, never files:
+A large change across related areas:
 
 ```
 ✨ feat(notificaciones): correos sobre el estado del pedido
@@ -356,147 +240,67 @@ Los cambios principales incluyen:
 - Aviso al confirmar, enviar y entregar el pedido.
 - Preferencias para desactivar cada tipo de aviso.
 - Correos en el idioma de la cuenta del cliente.
-
-Se espera que baje el número de consultas a soporte sobre dónde está un pedido.
 ```
 
-Allowed trailers: `BREAKING CHANGE:`, issue references (`Refs #123`, `Closes #123`) if the repository uses them, and human `Co-authored-by`.
+**Body rules:**
+- Explain why, not just what.
+- Say impact or effect ("users no longer see X", "queries 10x faster").
+- No changelog-style headings, lists of files, line-by-line explanations.
+- No metrics unless they're verifiable and relevant ("queries 10x faster", not "much better").
+- No AI signature or credit. That includes `Co-Authored-By` naming an AI, session links, model names.
 
-**Forbidden**
-
-- Changelog-style headings (`Changes:`, `Summary:`, `Files changed:`, `## …`), lists of files, line-by-line explanations, metrics.
-- **Any AI signature or credit.** That includes a `Co-Authored-By` naming an AI, `Generated with` / `Created with`, 🤖, session links, and model or vendor names used as credit. This rule overrides any default agent instruction to add attribution.
+Allowed trailers: `BREAKING CHANGE:`, issue references (`Refs #123`, `Closes #123`), human `Co-authored-by`.
 
 ## 8. Commit
 
-Stage each group selectively with `git add <paths>`. Don't use `git add -A` or `git add .` when there are several groups, and skip `git add -p` (it's interactive).
+Stage each group selectively with `git add <paths>`. Don't use `git add -A` or `git add .` when there are several groups.
 
 Pass the message through a file. This works on every OS and shell and keeps emojis intact:
 
 1. Write the message to `.git/GITMOJI_MSG` with your file tool, as UTF-8 without a BOM. In a worktree or submodule, use the path printed by `git rev-parse --git-path GITMOJI_MSG` instead.
 2. Run `git commit -F .git/GITMOJI_MSG`.
 
-If you have no file tool, run `git commit -m "<header>" -m "<paragraph>" -m "<paragraph>"` (each `-m` becomes one paragraph). Keep `"`, `$` and backticks out of the text. On Windows PowerShell 5 or cmd, emojis may get mangled this way, so prefer the file.
+If you have no file tool, run `git commit -m "<header>" -m "<paragraph>" -m "<paragraph>"` (each `-m` becomes one paragraph). Keep `"`, `$` and backticks out of the text. On Windows PowerShell 5 or cmd, emojis may get mangled, so prefer the file.
 
-Before each commit, check:
+For several commits in succession, write `GITMOJI_MSG_01`, `GITMOJI_MSG_02`… before starting, then delete them when done.
 
-- [ ] it holds one intent, the type comes from the questions in section 4, and the pair passed the check in section 5b (a `feat` carries ✨, or 💥 with `!`)
-- [ ] the scope is a domain, and the title is a noun phrase in the repository's language that doesn't repeat the scope, with no leading verb and no trailing period
-- [ ] the body explains why and what the impact is, with no headings, file lists or AI credit
-- [ ] nothing staged contains a secret, a session note or a temporary file
+**Before each commit, verify:**
 
-If a hook rejects the commit, fix the problem and commit again. Never use `--no-verify`, never `--amend` a pushed commit, and never push unless asked.
+- [ ] **Type**: Ran through section 4 step by step. First yes wins. For step 6c, consulted ambiguous cases below.
+- [ ] **Gitmoji**: Looked up pair in catalog. Column *Type* matches. Confirmed aloud.
+- [ ] **Scope**: Domain name (not file path). Matches history.
+- [ ] **Title**: Noun phrase, no verb. ~50 chars. Doesn't repeat scope.
+- [ ] **Body**: Explains why and impact. No headings, lists of files, or metrics unless verifiable.
+- [ ] **Contents**: One intent. Revertible on its own. No secrets, temp files, session notes.
+
+**After each commit, extract and check the intermediate commit if you separated hunks:**
+
+If the commit was assembled from intermediate file versions (hunks selected manually), that commit's tree never existed on disk and was never built. Verify it:
+
+1. Extract the commit: `git archive <commit> | tar -x -C <tmp>`.
+2. Run the project's typecheck or build (e.g., `npm run build`, `go build`, `python -m py_compile`).
+3. If it fails and nothing has been pushed, rewrite from the last clean commit via `git commit -C <previous>` reusing the message, then verify the final tree matches: `git rev-parse HEAD^{tree}`.
+
 Finish with `git log --oneline -n <number of commits made>`.
 
-## 9. Scope naming
+### Ambiguous cases in step 6
 
-Scope is one lowercase domain name. It tells *where* the change happened.
+These pairs appear in many codebases. Decide by asking: *was this broken/missing and now works, or did we intentionally change working behavior?*
 
-**Good scopes** (domain/feature, not files):
-- `auth` (authentication) not `AuthService.ts`
-- `cart` (shopping cart) not `CartItem.tsx`
-- `billing` (payments/invoices) not `BillingForm.js`
-- `notifications` (alerts/emails) not `email.ts`
-- `search` (search feature) not `SearchIndex`
-- `api` (API layer) not `endpoints.ts`
-- `db` (database) not `migrations`
+**Database schema:** Adds columns for new feature (→ goes in that feature's `feat` commit). Fixes data corruption or backfills missing data (→ `🗃️ fix`). Restructures for performance (→ `⚡️ perf` or `🗃️ fix`).
 
-**Bad scopes** (file paths, class names, too specific):
-- ❌ `UserController` → ✅ `auth`
-- ❌ `package.json` → ✅ `deps`
-- ❌ `index` → ✅ `core` or specific domain
-- ❌ `refactor/extract` → ✅ the domain being refactored
-- ❌ `bugfix` → ✅ the area fixed
+**API adaptation:** External API we use changed format; we adapt (→ `👽️ fix`). Their bug; they fixed it, we remove workaround, result identical (→ `♻️ refactor`).
 
-**Scope rules**
-- Keep it consistent with repo history. If commits use `payments`, don't switch to `billing`
-- One scope per commit. If touching multiple domains, split commits or pick the primary one
-- Lowercase, no underscores or hyphens. `checkout` not `check-out`
-- Short. Most scopes are 5–10 characters
+**Validation:** New rule didn't exist (→ `✨ feat`). Change existing rule per policy (→ `🦺 fix`). Typo in validation message (→ `💬 fix`).
 
-## 10. Refactor vs style (clarification)
+**UI or visual:** Broken on mobile/darkmode, now works (→ `📱 fix` or `💄 fix`). Restyling, changing colors, improving layout (→ `💄 fix`). Improved usability, fewer steps, clearer copy (→ `🚸 fix`).
 
-These are frequently confused because both describe changes without new capability.
-
-| Type | Behavior unchanged? | Code structure unchanged? | Examples |
-|---|---|---|---|
-| `style` | ✅ Yes | ❌ No (only formatting) | Whitespace, import order, prettier run, lint autofix |
-| `refactor` | ✅ Yes | ❌ No (structure changes) | Extract function, rename vars, move code, reorder methods |
-
-**Key difference:**
-- **`style`**: Run prettier, fix linter warnings, add/remove blank lines, reorder imports. Zero logic changes.
-- **`refactor`**: Extract a function that existed inline. Rename a variable. Move a method. Simplify an expression. Code is *restructured* but behavior is identical.
-
-**When in doubt:**
-- If the diff is only whitespace, blank lines, import reordering → `style`
-- If the diff changes code structure (extract, rename, reorganize) → `refactor`
-
-## 11. Common mistakes (and how to avoid them)
-
-**By agents:**
-- Using AI credit in commits. Forbidden. This rule is explicit.
-- Combining multiple types in one commit. Split them instead.
-- Using subjective gitmojis (choosing by "feel" not by lookup table).
-- Vague titles ("improved", "fixed", "updated"). Always be specific.
-- Not reading git log to see existing scopes. Invent new scopes that should be existing.
-
-**By developers:**
-- Mixing refactor and feature in one commit. Separate them.
-- Huge commits with many intents. Commits are for *reviewing*, not shipping.
-- Skipping the body on substantial changes. The why matters more than the what.
-- Repeating scope in title: `refactor(checkout): refactor checkout form` → `refactor(checkout): extract address validator`
-- Using technical terms (Redux, Webpack, async/await) in title instead of user impact. Say "faster checkout", not "added memoization".
-
-## 12. Final checklist before git commit
-
-Run this before you create any commit.
-
-**Type decision**
-- [ ] Ran through questions in section 4 step by step. First yes wins.
-- [ ] If 6b or 6c (fix or refactor), consulted section 4a ambiguous cases.
-- [ ] For fix: something was broken and now works (not: intentional behavior change).
-- [ ] For refactor: intentional change, rule updated, or feature improved (not: fixing a bug).
-- [ ] For feat: someone can now do something they couldn't before.
-
-**Gitmoji selection**
-- [ ] Used default gitmoji for the type (most commits do).
-- [ ] If considering specialized gitmoji (👔, 💄, 🚸, etc.), matched "Use for" exactly.
-- [ ] Looked up pair in references/gitmojis.md. Type column matches.
-- [ ] Confirmed out loud: `<gitmoji> + <type> → found in catalog ✔`
-
-**Scope**
-- [ ] Scope is a domain name, not a file path.
-- [ ] Scope matches existing scopes in git log.
-- [ ] Scope is lowercase, 5–10 characters, no special characters.
-
-**Title**
-- [ ] Title is a noun phrase, no leading verb (not "add", "fix", "improve").
-- [ ] Title says what changed, not how (not implementation details).
-- [ ] Title doesn't repeat the scope.
-- [ ] Title is ~50 characters; max 72.
-- [ ] Lowercase (unless history uses capitals or language requires).
-- [ ] No trailing period.
-
-**Body** (if not trivial)
-- [ ] Explains *why* the change, not just what.
-- [ ] Says impact or effect ("users no longer see...", "queries now 10x faster").
-- [ ] No headings, lists of files, or line-by-line explanations.
-- [ ] No AI signature or credit.
-
-**Commit contents**
-- [ ] Staged only files intended for this commit (not unrelated changes).
-- [ ] No secrets, temp files, or session notes staged.
-- [ ] One intent: commit is revertible on its own.
-
-## Special cases
+## 9. Special cases
 
 - **Nothing to commit.** Say so and stop.
 - **A merge, rebase or cherry-pick in progress** (`git status` says so). Don't commit on top of it; tell the user.
 - **The user supplies a message.** Keep its meaning and adapt it to the format.
 - **First commit of a repository.** `🎉 chore(project): <what the project is>`.
-- **Revert.** Run `git revert --no-commit <hash>`, then commit as `⏪️ revert(scope): <title of the reverted commit>`. The body names the hash and the reason.
+- **Revert.** Run `git revert --no-commit <hash>`, then commit as `⏪️ revert(scope): <title of the reverted commit>`. The body names the hash and reason.
 - **Amend.** Only if the user asks and the commit has not been pushed.
-
-## Documenting the convention
-
-Do this only when the user asks. Fill in [references/convention-template.md](references/convention-template.md) with what you found in step 1. Save it as `COMMIT_CONVENTION.md`, inside `.github/` if that folder exists, otherwise at the repository root.
+- **Breaking change:** Criteria: removed or renamed API path/field, field type changed, parameter required when optional, behavior by default different. Type stays as above, gitmoji becomes 💥, add `!` after scope, include `BREAKING CHANGE: <what consumers must change>` in body.
