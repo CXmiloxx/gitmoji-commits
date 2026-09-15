@@ -95,6 +95,17 @@ If there is more than one group, show the plan as one line per commit (title and
 
 Ask these about the group being committed, in order. Each one is a yes/no question about the changed paths and the diff, never about how the change feels. **The first `yes` decides the type. Stop there.**
 
+**Quick reference: most common types**
+
+| If the diff… | Type | Example |
+|---|---|---|
+| Adds new capability | `feat` | User can now export reports; new login method |
+| Fixes broken behavior | `fix` | Button click now works; query returns correct result |
+| Changes existing rule/behavior intentionally | `refactor` | Discount formula changed; payment due date calculation adjusted |
+| Only tests, docs, or config | `test`, `docs`, `build`, `chore` | Add unit tests; write README; update tsconfig |
+| Same behavior, measurably faster | `perf` | Caching added; query plan optimized |
+| Code moves/renames, behavior unchanged | `refactor` | Extract function; rename module; reorganize imports |
+
 1. Does the group undo an earlier commit? → `revert`
 2. Is *every* changed path documentation (`*.md`, `docs/`, API reference) or a comment inside code? → `docs`
 3. Is *every* changed path a test, mock, fixture or snapshot? → `test`
@@ -102,8 +113,14 @@ Ask these about the group being committed, in order. Each one is a yes/no questi
 5. Is *every* changed path build, packaging or dependency (manifest, lockfile, bundler config, Dockerfile)? → `build`
 6. Does the diff change what a user or a caller can observe (output, screen, response, side effect)?
    - 6a. Can someone now do something they could not do before this commit? → `feat`
+      - *Examples:* new endpoint, new command, new UI button, new filter option, new validation rule
+      - *Not feat:* fixing a button that was broken, changing an existing filter, adapting to API change
    - 6b. Does it repair something that was broken or working incorrectly (a defect)? → `fix`
+      - *Examples:* wrong calculation result, missing data, broken flow, API returning null, button not clickable
+      - *Not fix:* intentional change to a formula, updating a policy, adjusting due date logic
    - 6c. Does it change existing rules, logic or behavior intentionally (no new capability, not a bug)? → `refactor`
+      - *Examples:* change discount formula, adjust payment due dates, adapt to external API change, improve usability flow, add new validation rule
+      - *Not refactor:* fixing a crash, repairing broken feature
 7. Behavior is identical. Is it measurably faster or lighter? → `perf`
 8. Behavior is identical. Is the diff formatting only (whitespace, lint autofix, import order)? → `style`
 9. Behavior is identical. Is code restructured (rename, extract, move, simplify, dead code removed)? → `refactor`
@@ -113,11 +130,42 @@ Rules that resolve the cases where two answers look true:
 
 1. Steps 2–5 need *every* path to qualify. One production file in the group sends it to step 6.
 2. Step 6a is about capability, not size. A one-line option nobody had before is `feat`; a rewritten screen that does the same as before is `refactor`.
-3. Step 6b is for actual defects: behavior that broke, crashes, wrong results. A deliberate change to a rule (different formula, new policy) is step 6c `refactor`, not 6b.
+3. Step 6b is for actual defects: behavior that broke, crashes, wrong results, missing features that should have worked.
+   - `fix`: "Button didn't work and now does" / "Calculation had a bug and now is correct" / "Data was lost and now persists"
+   - `refactor` (6c): "Button behavior changed intentionally" / "Calculation formula updated per new policy" / "Discount logic rewritten"
+   - **Rule of thumb:** If you're answering "that worked, but we're changing how it works," it's `refactor`. If "that didn't work, now it does," it's `fix`.
 4. A refactor that also fixes a bug is two commits. If they cannot be separated, the group is `fix`.
 5. CSS/UI is never `style`. New UI is `✨ feat`; restyling, changing colors or layout of existing UI is `♻️ refactor`; repairing broken styles is `💄 fix`.
 6. `chore` is step 10 because it is the last resort, never a catch-all.
 7. **Breaking change** (removed or renamed API, incompatible contract or config): the type stays whatever these steps produced. Use 💥 instead of that type's gitmoji, add `!` after the scope, and add the footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
+
+### 4a. Ambiguous cases
+
+These appear in many codebases. Decide by asking: *was this broken and now works, or did we intentionally change working behavior?*
+
+**Database schema or migration**
+- `fix`: Migration fixes data corruption or missing data (e.g., populates null values that should have been filled)
+- `refactor`: Migration adds new columns, restructures tables, or changes data format for new feature
+
+**API integration or third-party service**
+- `fix`: API we integrate with had a bug and we worked around it; now they fixed it and we remove the workaround
+- `refactor`: External API changed its format or behavior; we adapt our code to the new contract
+
+**Validation or business rules**
+- `fix`: Validation was missing and payments were processing with invalid data (now they reject invalid)
+- `refactor`: Validation rule changed per new policy (e.g., minimum purchase amount raised)
+
+**UI or visual**
+- `fix`: Button was unclickable, text was invisible, layout was broken on mobile; now it works
+- `refactor`: We restyled buttons, changed colors, improved spacing, or redesigned a form (same function, new look)
+
+**Performance without observable change**
+- `perf`: Code is faster but output and behavior identical to before
+- `refactor`: We change how caching works, or restructure data fetching (behavior same, but internal design changes)
+
+**Accessibility or usability flow**
+- `fix`: Users couldn't use a feature due to missing keyboard support or broken screen reader
+- `refactor`: We improve the flow (fewer clicks, clearer labels, better feedback) but feature already worked
 
 ## 5. Gitmoji
 
