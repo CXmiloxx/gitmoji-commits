@@ -102,7 +102,8 @@ Ask these about the group being committed, in order. Each one is a yes/no questi
 5. Is *every* changed path build, packaging or dependency (manifest, lockfile, bundler config, Dockerfile)? → `build`
 6. Does the diff change what a user or a caller can observe (output, screen, response, side effect)?
    - 6a. Can someone now do something they could not do before this commit? → `feat`
-   - 6b. Otherwise → `fix`. This covers a defect *and* an intentional change to how something existing behaves, because neither adds a capability.
+   - 6b. Does it repair something that was broken or working incorrectly (a defect)? → `fix`
+   - 6c. Does it change existing rules, logic or behavior intentionally (no new capability, not a bug)? → `refactor`
 7. Behavior is identical. Is it measurably faster or lighter? → `perf`
 8. Behavior is identical. Is the diff formatting only (whitespace, lint autofix, import order)? → `style`
 9. Behavior is identical. Is code restructured (rename, extract, move, simplify, dead code removed)? → `refactor`
@@ -111,11 +112,12 @@ Ask these about the group being committed, in order. Each one is a yes/no questi
 Rules that resolve the cases where two answers look true:
 
 1. Steps 2–5 need *every* path to qualify. One production file in the group sends it to step 6.
-2. Step 6a is about capability, not size. A one-line option nobody had before is `feat`; a rewritten screen that does the same as before is `fix`.
-3. A refactor that also fixes a bug is two commits. If they cannot be separated, the group is `fix`.
-4. CSS/UI is never `style`. New UI is `✨ feat`; restyling or repairing existing UI is `💄 fix`.
-5. `chore` is step 10 because it is the last resort, never a catch-all.
-6. **Breaking change** (removed or renamed API, incompatible contract or config): the type stays whatever these steps produced. Use 💥 instead of that type's gitmoji, add `!` after the scope, and add the footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
+2. Step 6a is about capability, not size. A one-line option nobody had before is `feat`; a rewritten screen that does the same as before is `refactor`.
+3. Step 6b is for actual defects: behavior that broke, crashes, wrong results. A deliberate change to a rule (different formula, new policy) is step 6c `refactor`, not 6b.
+4. A refactor that also fixes a bug is two commits. If they cannot be separated, the group is `fix`.
+5. CSS/UI is never `style`. New UI is `✨ feat`; restyling, changing colors or layout of existing UI is `♻️ refactor`; repairing broken styles is `💄 fix`.
+6. `chore` is step 10 because it is the last resort, never a catch-all.
+7. **Breaking change** (removed or renamed API, incompatible contract or config): the type stays whatever these steps produced. Use 💥 instead of that type's gitmoji, add `!` after the scope, and add the footer: `💥 feat(api)!: …` + `BREAKING CHANGE: <what consumers must change>`.
 
 ## 5. Gitmoji
 
@@ -127,7 +129,7 @@ The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gi
 4. **Exception, or nothing.** If the candidate's *Type* differs, the pair is valid only when the row's *Exception* names your type **and** its condition is literally true for this diff. When it is not, discard the candidate and go back to the default of step 1.
 5. **Breaking change.** If the change breaks consumers, the gitmoji becomes 💥 and the header carries `!`. This replaces the result of the steps above.
 
-**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. So `🚸 feat` or `💄 feat` announces a version bump the gitmoji does not carry. Whatever area a change touches, if it lets someone do something they could not do before it is `✨ feat`; every area gitmoji describes a change to something that already exists.
+**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. Whatever area a change touches, if it lets someone do something they could not do before it is `✨ feat`. Gitmojis below it describe changes to things that already exist, so they can never be feat.
 
 Two things are never allowed: a pair that the catalog does not list, and a gitmoji chosen from memory without opening the file. 🚧 💩 🍻 stay out of shared history.
 
