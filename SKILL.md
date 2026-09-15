@@ -167,6 +167,47 @@ These appear in many codebases. Decide by asking: *was this broken and now works
 - `fix`: Users couldn't use a feature due to missing keyboard support or broken screen reader
 - `refactor`: We improve the flow (fewer clicks, clearer labels, better feedback) but feature already worked
 
+### 4b. Real commit examples
+
+**✨ feat: new capability**
+```
+✨ feat(checkout): one-click payment with saved cards
+
+Users can now check out with a previously saved card without re-entering
+details. Reduces cart abandonment on mobile.
+```
+
+**🐛 fix: defect repair**
+```
+🐛 fix(cart): total calculation includes all discounts
+
+Percentage coupons applied after fixed-amount ones calculated on original
+price instead of reduced price. Customers were charged incorrectly.
+```
+
+**♻️ refactor: intentional behavior change**
+```
+♻️ refactor(billing): payment due date calculated from invoice, not order
+
+Previously due 30 days from order. Now due 30 days from invoice date to
+align with accounting period. Gives customers more time to pay.
+```
+
+**📚 docs: documentation**
+```
+📚 docs(api): add webhook retry policy to reference
+
+Webhooks retry 5 times with exponential backoff. Previously only mentioned
+in comments.
+```
+
+**⚡️ perf: measurably faster, same behavior**
+```
+⚡️ perf(orders): cache product catalog in-memory
+
+Catalog query eliminated on every order. Response time 200ms → 5ms.
+```
+
 ## 5. Gitmoji
 
 The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gitmojis.md) holds all 75, grouped by the one type each belongs to, and it is the only source of truth. Run these steps with the file open:
@@ -180,6 +221,27 @@ The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gi
 **`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; the rest are `patch` or `null`. Whatever area a change touches, if it lets someone do something they could not do before it is `✨ feat`. Gitmojis below it describe changes to things that already exist, so they can never be feat.
 
 Two things are never allowed: a pair that the catalog does not list, and a gitmoji chosen from memory without opening the file. 🚧 💩 🍻 stay out of shared history.
+
+### 5a. When to use specialized gitmojis (instead of defaults)
+
+Most commits use the default gitmoji. Specialized ones describe *what* the commit changes, not the type. Use only when the "Use for" row matches *exactly*.
+
+**🐛 fix (default) vs specialized fix gitmojis:**
+- 🚑️ `:ambulance:` - only if critical production outage (data loss, downtime). Everything else is 🐛
+- 🔒️ `:lock:` - only if closing a security hole (injection, auth bypass, leaked data)
+- 🩹 `:adhesive_bandage:` - only if tiny, non-critical edge case. Prefer 🐛 when unsure
+- Example: Button click fixed = 🐛. Button click on mobile fixed = 🩹 if truly minor. Data calculation fixed = 🐛.
+
+**♻️ refactor (default) vs specialized refactor gitmojis:**
+- 👔 `:necktie:` - only if changing business rules/calculations/policies (discount formula, due date logic)
+- 💄 `:lipstick:` - only if visual UI change (restyling, colors, spacing, fonts). Never for CSS bug fix.
+- 🚸 `:children_crossing:` - only if improving usability (fewer steps, clearer text, better feedback)
+- 🛂 `:passport_control:` - only if adding/changing authorization rules or roles
+- 🦺 `:safety_vest:` - only if adding/changing validation rules
+- 👽️ `:alien:` - only if adapting to external API change
+- Example: Change button color = 💄. Fix button visual bug = 🐛. Improve form flow = 🚸.
+
+**Rule: When in doubt, use the default.** Specialized gitmojis should be obvious from the commit diff.
 
 ## 5b. Validate before writing the message
 
@@ -227,6 +289,25 @@ Translate one of them only if the user asks you to. Everyday words are still tra
 - Don't repeat the scope. The scope already says where the change happened; the title says what changed there.
 - Describe the change you actually made, not the entire feature it belongs to.
 
+**What makes a good title**
+- Specific: says exactly what changed, not how
+- Backward-compatible: someone reading it 6 months later understands the intent
+- Short: one sentence, about 50 characters ideal
+- Searchable: uses domain terms, not library names
+
+**Anti-patterns to avoid**
+
+| ❌ Bad | Problem |
+|---|---|
+| `fix(auth): bug` | No detail, meaningless |
+| `feat(app): lots of stuff` | Too vague, multiple intents |
+| `refactor: stuff` | No scope, no specificity |
+| `perf: faster queries` | Says what but not why or what impact |
+| `✨ feat(api): added authentication` | Starts with verb |
+| `fix(UserService.ts): validate email` | File name as scope, not domain |
+| `refactor(index.js): cleanup` | Abstract, says nothing real |
+| `chore: updated dependencies` | Should list what changed |
+
 | ❌ | ✅ | Why |
 |---|---|---|
 | `✨ feat(auth): add Google login` | `✨ feat(auth): sign-in with Google accounts` | no leading verb |
@@ -236,6 +317,19 @@ Translate one of them only if the user asks you to. Everyday words are still tra
 | `✨ feat(dashboard): new dashboard charts` | `✨ feat(dashboard): monthly sales by category` | the scope is not repeated |
 
 Any language works the same way: `🐛 fix(carrito): total correcto con cupones combinados` · `♻️ refactor(panier): calcul des remises dans un seul service` · `⚡️ perf(relatorios): exportação sem bloquear a interface` · `✨ feat(suche): Filter nach Preis und Marke`.
+
+**More title examples across languages**
+
+| ❌ | ✅ | Language |
+|---|---|---|
+| `feat(auth): add Facebook` | `feat(auth): sign-in with Facebook` | English |
+| `fix(checkout): totals fixed` | `fix(checkout): correct total with stacked coupons` | English |
+| `refactor: mejorado` | `refactor(billing): due date from invoice, not order` | Spanish |
+| `feat(carrito): new feature` | `feat(carrito): save cart for later` | Spanish/English |
+| `fix(paiement): bug prix` | `fix(paiement): TVA appliquée sur prix réduit` | French |
+| `perf: rapide` | `perf(search): index queries without blocking UI` | French/English |
+| `refactor: cleanupCode` | `refactor(auth): extract token validation to helper` | English |
+| `chore: update stuff` | `chore(deps): upgrade React to 18.2` | English |
 
 **Body** says what changed, why, and what the impact is, in prose. Skip it only for trivial commits (typo, formatting, dependency bump).
 
@@ -293,6 +387,106 @@ Before each commit, check:
 
 If a hook rejects the commit, fix the problem and commit again. Never use `--no-verify`, never `--amend` a pushed commit, and never push unless asked.
 Finish with `git log --oneline -n <number of commits made>`.
+
+## 9. Scope naming
+
+Scope is one lowercase domain name. It tells *where* the change happened.
+
+**Good scopes** (domain/feature, not files):
+- `auth` (authentication) not `AuthService.ts`
+- `cart` (shopping cart) not `CartItem.tsx`
+- `billing` (payments/invoices) not `BillingForm.js`
+- `notifications` (alerts/emails) not `email.ts`
+- `search` (search feature) not `SearchIndex`
+- `api` (API layer) not `endpoints.ts`
+- `db` (database) not `migrations`
+
+**Bad scopes** (file paths, class names, too specific):
+- ❌ `UserController` → ✅ `auth`
+- ❌ `package.json` → ✅ `deps`
+- ❌ `index` → ✅ `core` or specific domain
+- ❌ `refactor/extract` → ✅ the domain being refactored
+- ❌ `bugfix` → ✅ the area fixed
+
+**Scope rules**
+- Keep it consistent with repo history. If commits use `payments`, don't switch to `billing`
+- One scope per commit. If touching multiple domains, split commits or pick the primary one
+- Lowercase, no underscores or hyphens. `checkout` not `check-out`
+- Short. Most scopes are 5–10 characters
+
+## 10. Refactor vs style (clarification)
+
+These are frequently confused because both describe changes without new capability.
+
+| Type | Behavior unchanged? | Code structure unchanged? | Examples |
+|---|---|---|---|
+| `style` | ✅ Yes | ❌ No (only formatting) | Whitespace, import order, prettier run, lint autofix |
+| `refactor` | ✅ Yes | ❌ No (structure changes) | Extract function, rename vars, move code, reorder methods |
+
+**Key difference:**
+- **`style`**: Run prettier, fix linter warnings, add/remove blank lines, reorder imports. Zero logic changes.
+- **`refactor`**: Extract a function that existed inline. Rename a variable. Move a method. Simplify an expression. Code is *restructured* but behavior is identical.
+
+**When in doubt:**
+- If the diff is only whitespace, blank lines, import reordering → `style`
+- If the diff changes code structure (extract, rename, reorganize) → `refactor`
+
+## 11. Common mistakes (and how to avoid them)
+
+**By agents:**
+- Using AI credit in commits. Forbidden. This rule is explicit.
+- Combining multiple types in one commit. Split them instead.
+- Using subjective gitmojis (choosing by "feel" not by lookup table).
+- Vague titles ("improved", "fixed", "updated"). Always be specific.
+- Not reading git log to see existing scopes. Invent new scopes that should be existing.
+
+**By developers:**
+- Mixing refactor and feature in one commit. Separate them.
+- Huge commits with many intents. Commits are for *reviewing*, not shipping.
+- Skipping the body on substantial changes. The why matters more than the what.
+- Repeating scope in title: `refactor(checkout): refactor checkout form` → `refactor(checkout): extract address validator`
+- Using technical terms (Redux, Webpack, async/await) in title instead of user impact. Say "faster checkout", not "added memoization".
+
+## 12. Final checklist before git commit
+
+Run this before you create any commit.
+
+**Type decision**
+- [ ] Ran through questions in section 4 step by step. First yes wins.
+- [ ] If 6b or 6c (fix or refactor), consulted section 4a ambiguous cases.
+- [ ] For fix: something was broken and now works (not: intentional behavior change).
+- [ ] For refactor: intentional change, rule updated, or feature improved (not: fixing a bug).
+- [ ] For feat: someone can now do something they couldn't before.
+
+**Gitmoji selection**
+- [ ] Used default gitmoji for the type (most commits do).
+- [ ] If considering specialized gitmoji (👔, 💄, 🚸, etc.), matched "Use for" exactly.
+- [ ] Looked up pair in references/gitmojis.md. Type column matches.
+- [ ] Confirmed out loud: `<gitmoji> + <type> → found in catalog ✔`
+
+**Scope**
+- [ ] Scope is a domain name, not a file path.
+- [ ] Scope matches existing scopes in git log.
+- [ ] Scope is lowercase, 5–10 characters, no special characters.
+
+**Title**
+- [ ] Title is a noun phrase, no leading verb (not "add", "fix", "improve").
+- [ ] Title says what changed, not how (not implementation details).
+- [ ] Title doesn't repeat the scope.
+- [ ] Title is ~50 characters; max 72.
+- [ ] Lowercase (unless history uses capitals or language requires).
+- [ ] No trailing period.
+
+**Body** (if not trivial)
+- [ ] Explains *why* the change, not just what.
+- [ ] Says impact or effect ("users no longer see...", "queries now 10x faster").
+- [ ] No headings, lists of files, or line-by-line explanations.
+- [ ] No AI signature or credit.
+
+**Commit contents**
+- [ ] Staged only files intended for this commit (not unrelated changes).
+- [ ] No secrets, temp files, or session notes staged.
+- [ ] One intent: commit is revertible on its own.
 
 ## Special cases
 
