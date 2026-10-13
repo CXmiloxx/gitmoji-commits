@@ -4,7 +4,7 @@ description: 'Writes git commits with gitmoji and Conventional Commits (`<gitmoj
 license: MIT
 metadata:
   author: CXmiloxx
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Gitmoji Commits
@@ -39,7 +39,9 @@ From that output, settle four things without writing them down:
 - **Existing rules.** If the last command lists files, read only their commit section. They override this skill, and commits must pass any commitlint or hook config.
 - **Language.** See section 6.
 - **Scopes.** Reuse the ones in history. For a new area, name the module or domain.
-- **Emoji style.** Write the character (`✨`) unless history uses shortcodes (`:sparkles:`). If history consistently uses its own emoji for a type (for example `📚` for docs), keep it. If a type has a custom emoji in history, keep using that emoji.
+- **Emoji format.** Write the character (`✨`) unless history uses shortcodes (`:sparkles:`). That is the only thing history decides about the emoji.
+
+**History never decides the pair.** If past commits use a pair that is not in the allowlist of section 5 (`🗃️ feat`, `💄 feat`, `📚 docs`, `🐛 refactor`…), they are mistakes: don't copy them, and tell the user once, in one line. Only a written convention file (commitlint, `COMMIT_CONVENTION.md`, `.gitmojirc`) that explicitly lists a pair can allow it.
 
 Then read the changes themselves: `git diff`, `git diff --cached`, and any untracked files. For a large diff, read one path at a time with `git diff -- <path>`. For an untracked folder (`git status` shows `folder/`), list what's inside with `git status --short -uall -- <folder>`.
 
@@ -120,10 +122,10 @@ Ask these about the group being committed, in order. Each one is a yes/no questi
 6. Does the diff change what a user or caller can observe (output, screen, response, side effect)?
    - 6a. Can someone now do something they could not do before? → `feat`
       - *Example:* new endpoint, new command, new filter, new validation rule, new capability.
-   - 6b. Is something that was broken or working incorrectly now fixed? → `fix` (with area gitmoji if it matches)
-      - *Examples of `fix`*: button didn't respond now does; calculation was wrong now correct; data was lost now persists.
-      - *Examples of `fix` + area gitmoji*: changed business rule (👔 fix), restyled UI (💄 fix), improved flow (🚸 fix), adapted to API change (👽️ fix).
-      - *Rule:* Gitmoji describes *what area* changed, type describes *why* (it was broken and we fixed it, or we intentionally changed it per policy). Consult [references/gitmojis.md](references/gitmojis.md) "Use for" to match.
+   - 6b. Does it change behavior that already existed, either repairing it or adjusting it on purpose? → `fix`
+      - *Repairs*: button didn't respond now does; calculation was wrong now correct; data was lost now persists.
+      - *Intentional adjustments*: changed business rule, restyled UI, fewer steps in a flow, adapted to an external API change.
+      - If 6a and 6b are both true (a restructure that also opens a new capability), 6a wins: `feat`.
    - 6c. Does nothing else apply? → `chore` (config, tooling, release, seeds, logs).
 
 7. Behavior is identical. Is it measurably faster or lighter? → `perf`
@@ -138,35 +140,67 @@ Ask these about the group being committed, in order. Each one is a yes/no questi
 
 1. Steps 2–5 need *every* path to qualify. One production or instruction file sends it to step 6.
 2. Step 6a is about capability, not size. A one-line option nobody had is `feat`; a rewritten screen doing the same is `refactor` or `style`.
-3. Breaking change (removed/renamed API, incompatible contract/config): type stays as above, gitmoji becomes 💥, add `!` after scope and `BREAKING CHANGE:` footer.
+3. The type is decided from the diff only, before thinking about any emoji. The area touched (database, UI, API) never decides the type: a new table that lets users do something new is `feat`, even though it is "database work".
+4. Breaking change (removed/renamed API, incompatible contract/config): type stays as above, gitmoji becomes 💥, add `!` after scope and `BREAKING CHANGE:` footer.
 
 ## 5. Gitmoji
 
-The gitmoji is looked up, never recalled. [references/gitmojis.md](references/gitmojis.md) holds all 75, grouped by type, and is the only source of truth. Run these steps with the file open:
+The gitmoji is picked **after** the type and **only among the gitmojis allowed for that type**. The type says *why* the commit exists; the gitmoji must be relevant to that same why. The area (database, UI, API…) goes in the scope and the title, never in a gitmoji that belongs to another type.
 
-1. **Default.** Take the default gitmoji of the type from section 4: `feat` ✨ · `fix` 🐛 · `refactor` ♻️ · `perf` ⚡️ · `style` 🎨 · `docs` 📝 · `test` ✅ · `build` 📦️ · `ci` 👷 · `chore` 🔧 · `revert` ⏪️.
+**Allowlist.** This is the complete set of valid pairs. Anything else is invalid, whatever the history, the emoji's name or another project says.
 
-2. **Candidate.** Look through the catalog, starting with the section for that type. If one row's *Use for* column describes the whole commit, it becomes the candidate. If none does, keep the default.
+| Type | Allowed | Allowed only under the condition in the catalog |
+|---|---|---|
+| `feat` | ✨ | — |
+| `fix` | 🐛 🚑️ 🔒️ 🩹 🥅 👔 💄 🚸 📱 💫 💬 ♿️ 🌐 🔍️ 📈 🛂 🦺 ✈️ 👽️ 🗃️ 🧵 🦖 | 🏷️ 🚨 ✏️ 🍱 🩺 🚩 |
+| `refactor` | ♻️ 🏗️ ⚰️ 🗑️ 🏷️ 🔥 🚚 | 🦖 |
+| `perf` | ⚡️ | 🗃️ 🧵 |
+| `style` | 🎨 🚨 | — |
+| `docs` | 📝 💡 ✏️ 👥 | 📄 |
+| `test` | ✅ 🧪 🤡 📸 | — |
+| `build` | 📦️ ⬆️ ⬇️ 📌 ➕ ➖ 🧱 | 🔧 🔨 |
+| `ci` | 👷 💚 🚀 | 🧱 🔐 |
+| `chore` | 🔧 🎉 🔖 🙈 🔨 🧑‍💻 🔐 🌱 🔊 🔇 🧐 🍱 🩺 🚩 ⚗️ 💸 🥚 📄 🔀 | 🔥 🚚 👥 🚀 |
+| `revert` | ⏪️ | — |
+| any type, with `!` | 💥 | breaking change only |
 
-3. **Check the pair.** The candidate's *Type* must equal the type from section 4. If it does, use it.
+**Steps:**
 
-4. **Exception, or nothing.** If the candidate's *Type* differs, the pair is valid only when the row's *Exception* names your type **and** the condition is literally true for this diff. When not, discard and go back to the default.
+1. **Default.** Start from the type's default: `feat` ✨ · `fix` 🐛 · `refactor` ♻️ · `perf` ⚡️ · `style` 🎨 · `docs` 📝 · `test` ✅ · `build` 📦️ · `ci` 👷 · `chore` 🔧 · `revert` ⏪️.
+2. **Specific gitmoji.** Open [references/gitmojis.md](references/gitmojis.md) and read **only the section of your type**. Every gitmoji you may use is listed there, including the conditional ones. Never look in another section for a "better" emoji.
+3. **Relevance test.** A specific gitmoji replaces the default only if its *Use for* describes the intent of the **whole** commit, not just the kind of file touched. 🗃️ for a `fix` that repairs a broken migration: yes. 🗃️ because a commit that adds a feature happens to touch SQL: no, that commit is `✨ feat`.
+4. **Conditional gitmojis.** One from the right column is allowed only when its written condition is literally true for this diff. If you have to argue for it, it isn't true: use the default.
+5. **Breaking change.** If consumers must change something, the gitmoji becomes 💥 and the header gets `!`. This replaces the steps above.
 
-5. **Breaking change.** If the change breaks consumers, gitmoji becomes 💥 and header carries `!`. This replaces the steps above.
+Never change the type to make an emoji fit. If the emoji you had in mind is not allowed for the type, the emoji is wrong, not the type.
 
-**`feat` always takes ✨.** The official catalog gives every gitmoji a `semver` level. Only ✨ is `minor` (for `feat`), only 💥 is `major`; the rest are `patch` or `null`. Whatever area a change touches, if it adds capability, it is `✨ feat`.
+🚧 💩 🍻 never go into shared history.
 
-Two things are never allowed: a pair not in the catalog, and a gitmoji chosen from memory without opening the file. 🚧 💩 🍻 stay out of shared history.
+### Wrong pairs that look reasonable
 
-## 5b. Validate before writing the message
+| ❌ | ✅ | Why |
+|---|---|---|
+| `🗃️ feat(empresas): …` | `✨ feat(empresas): …` | New capability: only ✨. The database is the area, not the intent |
+| `💄 feat(ui): dark mode` | `✨ feat(ui): dark mode` | A new theme is new capability |
+| `🦺 feat(signup): password strength rule` | `✨ feat(signup): …` | A rule that did not exist is `feat` |
+| `🐛 refactor(orders): …` | `♻️ refactor(orders): …` | 🐛 belongs to `fix` |
+| `✨ fix(cart): …` | `🐛 fix(cart): …` | ✨ belongs to `feat` |
+| `📚 docs(readme): …` | `📝 docs(readme): …` | 📚 is not a gitmoji |
+| `🗃️ fix(db): faster report query` | `🗃️ perf(reports): …` or `⚡️ perf(reports): …` | Speed only, same result: `perf` |
 
-For each commit, and before a single word of the message is written, confirm out loud, in one line:
+## 5b. Gate: validate the header
 
-```
-<gitmoji> + <type> → row found in references/gitmojis.md, column Type = <type>  ✔
-```
+This check runs twice: once before the message is written, and once on the real header after the commit.
 
-If the row's *Type* column does not literally contain the type, the pair is invalid: go back to section 5 and take the default. A commit is never created on a pair that was not read from the table in this session.
+1. Before writing the message, state in one line:
+
+   ```
+   <gitmoji> + <type> → allowlist row <type> contains <gitmoji> ✔ (condition: <text or "none">)
+   ```
+
+   If the type's row does not literally contain the gitmoji, stop and go back to section 5. A commit is never created on a pair that was not checked against the allowlist in this session.
+
+2. After committing, read the header back with `git log -1 --format=%s` and check it again: the emoji is the first thing, then a space and an allowed type. If it fails and the commit has not been pushed, fix it with `git commit --amend -F <message file>`.
 
 ## 6. Language
 
@@ -194,7 +228,7 @@ Translate one of them only if the user asks you to. Everyday words are still tra
 <body>
 ```
 
-**Scope** is one lowercase domain: `auth`, `checkout`, `orders`, `notifications`. Never a file, component, class, route or variable name. Scope must match existing scopes in the repository's history.
+**Scope** is one lowercase domain: `auth`, `checkout`, `orders`, `notifications`. Never a file, component, class, route or variable name. Reuse the scopes in history. A technical layer (`schema`, `db`, `api`, `ui`, `backend`) is not a domain: use the business domain the change belongs to (`empresas`, `pagos`), unless history already uses that layer as a scope consistently.
 
 **Title** is a noun phrase answering "what changed?" the way you'd tell a colleague in one sentence.
 
@@ -267,7 +301,7 @@ For several commits in succession, write `GITMOJI_MSG_01`, `GITMOJI_MSG_02`… b
 **Before each commit, verify:**
 
 - [ ] **Type**: Ran through section 4 step by step. First yes wins. For step 6c, consulted ambiguous cases below.
-- [ ] **Gitmoji**: Looked up pair in catalog. Column *Type* matches. Confirmed aloud.
+- [ ] **Gitmoji**: Chosen after the type, from that type's row of the allowlist only. Relevant to the intent, not just to the files. Gate of 5b stated aloud.
 - [ ] **Scope**: Domain name (not file path). Matches history.
 - [ ] **Title**: Noun phrase, no verb. ~50 chars. Doesn't repeat scope.
 - [ ] **Body**: Explains why and impact. No headings, lists of files, or metrics unless verifiable.
@@ -281,17 +315,19 @@ If the commit was assembled from intermediate file versions (hunks selected manu
 2. Run the project's typecheck or build (e.g., `npm run build`, `go build`, `python -m py_compile`).
 3. If it fails and nothing has been pushed, rewrite from the last clean commit via `git commit -C <previous>` reusing the message, then verify the final tree matches: `git rev-parse HEAD^{tree}`.
 
-Finish with `git log --oneline -n <number of commits made>`.
+Finish with `git log --oneline -n <number of commits made>` and run the second check of section 5b on every header listed.
 
 ### Ambiguous cases in step 6
 
 These pairs appear in many codebases. Decide by asking: *was this broken/missing and now works, or did we intentionally change working behavior?*
 
-**Database schema:** Adds columns for new feature (→ goes in that feature's `feat` commit). Fixes data corruption or backfills missing data (→ `🗃️ fix`). Restructures for performance (→ `⚡️ perf` or `🗃️ fix`).
+**Database schema:** New tables or columns that enable a capability users didn't have (→ `✨ feat`, in the same commit as the code that uses them). Restructuring existing data that also opens a new possibility, such as one record shared by two roles that used to be duplicated (→ `✨ feat`). Fixing corrupted data, a broken migration or a wrong constraint (→ `🗃️ fix`). Same result, only faster: index, query plan (→ `🗃️ perf` or `⚡️ perf`). Renamed or dropped tables or columns that other code or services read (→ add 💥 and `!`).
 
 **API adaptation:** External API we use changed format; we adapt (→ `👽️ fix`). Their bug; they fixed it, we remove workaround, result identical (→ `♻️ refactor`).
 
-**Validation:** New rule didn't exist (→ `✨ feat`). Change existing rule per policy (→ `🦺 fix`). Typo in validation message (→ `💬 fix`).
+**Validation:** New rule didn't exist (→ `✨ feat`). Change an existing rule per policy (→ `🦺 fix`). Typo in a validation message (→ `💬 fix`).
+
+**Permissions:** New role or new permission (→ `✨ feat`). Changed access rule or closed a missing check (→ `🛂 fix` or `🔒️ fix`).
 
 **UI or visual:** Broken on mobile/darkmode, now works (→ `📱 fix` or `💄 fix`). Restyling, changing colors, improving layout (→ `💄 fix`). Improved usability, fewer steps, clearer copy (→ `🚸 fix`).
 

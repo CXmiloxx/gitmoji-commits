@@ -56,7 +56,7 @@ Una intención por commit. Un título que dice qué cambió. Un cuerpo que expli
 | 🌍 **Cualquier idioma** | Los commits salen en español, inglés, francés, portugués, alemán o cualquier otro idioma, según el proyecto. |
 | 🔤 **Términos de programación en inglés** | *dashboard*, *endpoint*, *deploy* o *token* no se traducen, salvo que lo pidas. |
 | 🌳 **Decide el tipo** | Diez preguntas de sí/no sobre las rutas modificadas y el diff, gana la primera, y distinguen `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` y `revert`. |
-| 😀 **Los 75 gitmojis** | Cada gitmoji pertenece a un solo tipo, y los pocos que admiten un segundo llevan escrita la condición literal que lo permite. El par se busca en el catálogo y se verifica antes de escribir el mensaje, así que un 🐛 nunca acaba en un `feat`. |
+| 😀 **Los 75 gitmojis** | Cada gitmoji pertenece a un solo tipo, y los pocos que admiten un segundo llevan escrita la condición literal que lo permite. Primero se decide el tipo y el gitmoji sale solo de la lista permitida para ese tipo, así que un `feat` solo lleva ✨ y nunca acaba con un 🗃️ o un 🐛. El título se verifica antes y después del commit. |
 | 📦 **Agrupa los cambios** | Divide lo pendiente en commits de una sola intención, en orden lógico. Los tests y la documentación van con el cambio al que pertenecen. |
 | 🔐 **Cuida lo que se sube** | Detecta tokens, claves, contraseñas y cadenas de conexión escritas en el código, y deja fuera los `.env`, las notas de sesión, los logs, los dumps y otros archivos sobrantes. Te dice qué dejó fuera y por qué. |
 | 🚫 **Sin firmas de IA** | Ni `Co-Authored-By` de herramientas de IA, ni «Generated with», ni 🤖. |
@@ -117,7 +117,7 @@ flowchart LR
    - `fix` 🐛 + área: Algo estaba roto (🐛, 🚑️, 🔒️); o funcionaba pero cambió intencionalmente (👔 reglas de negocio, 💄 UI, 🚸 usabilidad, etc.). El gitmoji de área señala *qué* cambió.
    - `refactor` ♻️: Código reorganizado, mismo comportamiento.
    - Otros tipos: perf, style, docs, test, build, ci, chore, revert.
-5. **Gitmoji.** Parte del gitmoji por defecto del tipo, busca al candidato en el catálogo y lo conserva solo si el tipo de esa fila coincide (o si su condición de excepción se cumple literalmente). El par se declara y se contrasta con la tabla antes de escribir el mensaje.
+5. **Gitmoji.** Solo después de fijar el tipo. Parte del gitmoji por defecto del tipo y solo puede cambiarlo por otro de la lista permitida para ese tipo, cuando su uso describe la intención de todo el commit y no solo los archivos tocados (base de datos, UI). El par se declara antes de escribir el mensaje y se vuelve a comprobar sobre el título real después del commit.
 6. **Idioma.** Por orden de prioridad: lo que pidas, luego el archivo de convención, luego el historial, luego el README y por último el idioma en que escribes.
 7. **Mensaje.** Un título que describe el cambio sin empezar con verbo y un cuerpo que explica el porqué y el impacto.
 8. **Commit.** Hace staging selectivo y commitea a través de un archivo UTF-8, para que los emojis lleguen intactos en cualquier sistema.
@@ -132,7 +132,7 @@ flowchart LR
 
 | Parte | Regla |
 |---|---|
-| **gitmoji** | Válido para el tipo. Señala qué dominio/aspecto cambió. Se usa el carácter del emoji, salvo que el repo use `:shortcodes:`. |
+| **gitmoji** | Sale de la lista permitida del tipo. Relevante para la intención del commit, nunca elegido solo por el área. Se usa el carácter del emoji, salvo que el repo use `:shortcodes:`. |
 | **tipo** | Uno de los 11 tipos de abajo, siempre en inglés y en minúsculas. |
 | **scope** | Un dominio en minúsculas: `auth`, `checkout`, `pedidos`. Nunca un archivo, una clase ni un componente. Debe coincidir con los scopes existentes en el historial. |
 | **título** | Qué cambió, sin empezar con verbo, sin punto final y sin repetir el scope. Unos 50 caracteres ideales; máximo 72. |
@@ -208,8 +208,11 @@ Secretos escritos en el código (API keys, tokens, contraseñas, llaves privadas
 **Mi repositorio usa commitlint o una convención propia.**
 El skill lee esas reglas primero y las sigue. Tienen prioridad sobre todo lo demás.
 
-**Mi historial usa `:sparkles:` en vez de ✨, o 📚 para docs.**
-Mantiene el estilo que ya usa tu historial, así el log sigue siendo coherente.
+**Mi historial usa `:sparkles:` en vez de ✨.**
+Mantiene el formato de shortcodes que ya usa tu historial, así el log sigue siendo coherente.
+
+**Mi historial tiene pares como `🗃️ feat` o `📚 docs`.**
+El historial decide el formato, nunca el par. Los pares fuera de la lista permitida no se copian, y el agente te avisa una vez. Si tu equipo de verdad quiere uno, escríbelo en un `COMMIT_CONVENTION.md` o en la configuración de commitlint: una regla escrita es lo único que puede pasar por encima de la lista permitida.
 
 **¿Por qué títulos sin verbo («inicio de sesión con Google» en vez de «agregar login con Google»)?**
 El título dice qué contiene el commit, no una tarea por hacer. El resultado se lee como un changelog limpio, en cualquier idioma.

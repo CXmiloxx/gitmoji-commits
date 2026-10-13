@@ -2,6 +2,23 @@
 
 All notable changes to gitmoji-commits are documented here.
 
+## [1.2.0] — 2026-10-13
+
+### Changed
+
+- The gitmoji is chosen after the type and only from that type's allowlist, now embedded in `SKILL.md`. The catalog is no longer searched across sections, which let a commit pick 🗃️ for a `feat` because it touched the database.
+- History decides only the emoji format (character or shortcode), never the pair. Invalid pairs in past commits (`🗃️ feat`, `📚 docs`) are reported, not copied. Only a written convention file can allow a pair outside the allowlist.
+- Each catalog section now lists every gitmoji its type may use, including conditional ones borrowed from another type.
+- Catalog descriptions no longer cover "new" things outside ✨ (🦺, 💫, 🛂, 🗃️, 🌐, ✈️, 📈, 💄): anything new is `✨ feat`.
+- Step 6b covers repairs and intentional adjustments of existing behavior, as model A intended. When 6a and 6b both apply, `feat` wins.
+- The header is validated twice: before writing the message and on the real commit with `git log -1`.
+- Technical layers (`schema`, `db`, `api`, `ui`) are not scopes unless history already uses them consistently.
+
+### Added
+
+- Table of wrong pairs that look reasonable (`🗃️ feat`, `💄 feat`, `🦺 feat`, `📚 docs`…).
+- Ambiguous cases for database restructuring and permissions.
+
 ## [1.1.0] — 2026-09-15
 
 ### Changed

@@ -55,7 +55,7 @@ One intent per commit. A title that says what changed. A body that explains why 
 | 🌍 **Any language** | Commits come out in Spanish, English, French, Portuguese, German or any other language, matching the project. |
 | 🔤 **Programming terms stay in English** | *dashboard*, *endpoint*, *deploy* and *token* are never translated, unless you ask. |
 | 🌳 **Decides the type** | Ten yes/no questions about the changed paths and the diff, first match wins, separate `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` and `revert`. |
-| 😀 **All 75 gitmojis** | Every gitmoji belongs to exactly one type, and the few that allow a second one carry the literal condition that permits it. The pair is looked up in the catalog and verified before the message is written, so a 🐛 never lands on a `feat`. |
+| 😀 **All 75 gitmojis** | Every gitmoji belongs to exactly one type, and the few that allow a second one carry the literal condition that permits it. The type is decided first and the gitmoji is picked only from that type's allowlist, so a `feat` only ever carries ✨, and a 🗃️ or a 🐛 never lands on one. The header is checked before and after the commit. |
 | 📦 **Groups changes** | It splits your working tree into single-intent commits, in logical order. Tests and docs travel with the change they belong to. |
 | 🔐 **Guards what gets committed** | It finds hardcoded tokens, keys, passwords and connection strings, and leaves out `.env` files, session notes, logs, dumps and other leftovers. It tells you what it skipped and why. |
 | 🚫 **No AI signatures** | No `Co-Authored-By` for AI tools, no "Generated with", no 🤖. |
@@ -116,7 +116,7 @@ flowchart LR
    - `fix` 🐛 + area: Something was broken (🐛, 🚑️, 🔒️); or working but intentionally changed (👔 business rules, 💄 UI, 🚸 usability, etc.). Area gitmoji signals what changed.
    - `refactor` ♻️: Code restructured, behavior identical.
    - Other types: perf, style, docs, test, build, ci, chore, revert.
-5. **Gitmoji.** It starts from the type's default, looks the candidate up in the catalog, and keeps it only if the row's type matches (or its exception condition is literally true). The pair is stated and checked against the table before the message is written.
+5. **Gitmoji.** Only after the type is settled. It starts from the type's default and may switch to another gitmoji only from that type's allowlist, when its use describes the intent of the whole commit and not just the files touched (database, UI). The pair is stated before writing the message and checked again on the real header after the commit.
 6. **Language.** In order of priority: what you ask for, then the convention file, then the history, then the README, then the language you write in.
 7. **Message.** A noun-phrase title and a body that explains why and what the impact is.
 8. **Commit.** It stages selectively and commits through a UTF-8 file, so emojis survive on every OS.
@@ -131,7 +131,7 @@ flowchart LR
 
 | Part | Rule |
 |---|---|
-| **gitmoji** | Valid for the type. Signals what domain/aspect changed. The emoji character is used unless the repository uses `:shortcodes:`. |
+| **gitmoji** | Taken from the type's allowlist. Relevant to the commit's intent, never chosen by the area alone. The emoji character is used unless the repository uses `:shortcodes:`. |
 | **type** | One of the 11 types below, always in English and lowercase. |
 | **scope** | One domain in lowercase: `auth`, `checkout`, `orders`. Never a file, class or component. Must match existing scopes in history. |
 | **title** | What changed, as a noun phrase. No leading verb, no trailing period, and the scope is not repeated. ~50 chars ideal; max 72. |
@@ -209,8 +209,11 @@ Hardcoded secrets (API keys, tokens, passwords, private keys, connection strings
 **My repository uses commitlint or its own convention.**
 The skill reads those rules first and follows them. They take precedence over everything else.
 
-**My history uses `:sparkles:` instead of ✨, or 📚 for docs.**
-It keeps the style your history already uses, so the log stays consistent.
+**My history uses `:sparkles:` instead of ✨.**
+It keeps the shortcode format your history already uses, so the log stays consistent.
+
+**My history has pairs like `🗃️ feat` or `📚 docs`.**
+History decides the format, never the pair. Pairs outside the allowlist are not copied, and the agent tells you once. If your team really wants one, write it in a `COMMIT_CONVENTION.md` or commitlint config: a written rule is the only thing that overrides the allowlist.
 
 **Why titles without a verb ("sign-in with Google accounts" instead of "add Google login")?**
 The title says what the commit contains, not a task to do. The result reads like a clean changelog, in any language.
