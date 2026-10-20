@@ -51,12 +51,12 @@ One intent per commit. A title that says what changed. A body that explains why 
 
 | | |
 |---|---|
-| 🧭 **Adapts to your repository** | It reads recent history to learn the language, the scopes and the emoji style you already use. If commitlint or a written convention exists, it follows that. |
+| 🧭 **Adapts to your repository** | It reads recent history to learn the language, the scopes and the emoji style you already use. Wrong pairs in history are not copied. If commitlint or a written convention exists, it follows that. |
 | 🌍 **Any language** | Commits come out in Spanish, English, French, Portuguese, German or any other language, matching the project. |
 | 🔤 **Programming terms stay in English** | *dashboard*, *endpoint*, *deploy* and *token* are never translated, unless you ask. |
 | 🌳 **Decides the type** | Ten yes/no questions about the changed paths and the diff, first match wins, separate `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` and `revert`. |
 | 😀 **All 75 gitmojis** | Every gitmoji belongs to exactly one type, and the few that allow a second one carry the literal condition that permits it. The type is decided first and the gitmoji is picked only from that type's allowlist, so a `feat` only ever carries ✨, and a 🗃️ or a 🐛 never lands on one. The header is checked before and after the commit. |
-| 📦 **Groups changes** | It splits your working tree into single-intent commits, in logical order. Tests and docs travel with the change they belong to. |
+| 📦 **Groups changes** | It splits your working tree into single-intent commits, in logical order, by intent and never by layer. Tests and docs travel with the change they belong to. |
 | 🔐 **Guards what gets committed** | It finds hardcoded tokens, keys, passwords and connection strings, and leaves out `.env` files, session notes, logs, dumps and other leftovers. It tells you what it skipped and why. |
 | 🚫 **No AI signatures** | No `Co-Authored-By` for AI tools, no "Generated with", no 🤖. |
 | ⚡ **Light on tokens** | One short file drives the whole flow. The full catalog is read only when needed. |
@@ -133,9 +133,9 @@ flowchart LR
 |---|---|
 | **gitmoji** | Taken from the type's allowlist. Relevant to the commit's intent, never chosen by the area alone. The emoji character is used unless the repository uses `:shortcodes:`. |
 | **type** | One of the 11 types below, always in English and lowercase. |
-| **scope** | One domain in lowercase: `auth`, `checkout`, `orders`. Never a file, class or component. Must match existing scopes in history. |
+| **scope** | One domain in lowercase: `auth`, `checkout`, `orders`. Never a file, class, table or component. Reused from history when one fits. |
 | **title** | What changed, as a noun phrase. No leading verb, no trailing period, and the scope is not repeated. ~50 chars ideal; max 72. |
-| **body** | What changed, why, and what the impact is, in prose. A short list of behaviors is allowed for large changes. |
+| **body** | What changed, why, and what the impact is, in prose, wrapped at 72. Readable with only `git log`: no "see X" pointers. A short list of behaviors is allowed for large changes. |
 
 ### Types
 

@@ -52,12 +52,12 @@ Una intención por commit. Un título que dice qué cambió. Un cuerpo que expli
 
 | | |
 |---|---|
-| 🧭 **Se adapta al repositorio** | Lee el historial reciente para saber el idioma, los scopes y el estilo de emoji que ya usas. Si hay commitlint o una convención escrita, sigue eso. |
+| 🧭 **Se adapta al repositorio** | Lee el historial reciente para saber el idioma, los scopes y el estilo de emoji que ya usas. Los pares incorrectos del historial no se copian. Si hay commitlint o una convención escrita, sigue eso. |
 | 🌍 **Cualquier idioma** | Los commits salen en español, inglés, francés, portugués, alemán o cualquier otro idioma, según el proyecto. |
 | 🔤 **Términos de programación en inglés** | *dashboard*, *endpoint*, *deploy* o *token* no se traducen, salvo que lo pidas. |
 | 🌳 **Decide el tipo** | Diez preguntas de sí/no sobre las rutas modificadas y el diff, gana la primera, y distinguen `feat`, `fix`, `refactor`, `perf`, `style`, `docs`, `test`, `build`, `ci`, `chore` y `revert`. |
 | 😀 **Los 75 gitmojis** | Cada gitmoji pertenece a un solo tipo, y los pocos que admiten un segundo llevan escrita la condición literal que lo permite. Primero se decide el tipo y el gitmoji sale solo de la lista permitida para ese tipo, así que un `feat` solo lleva ✨ y nunca acaba con un 🗃️ o un 🐛. El título se verifica antes y después del commit. |
-| 📦 **Agrupa los cambios** | Divide lo pendiente en commits de una sola intención, en orden lógico. Los tests y la documentación van con el cambio al que pertenecen. |
+| 📦 **Agrupa los cambios** | Divide lo pendiente en commits de una sola intención, en orden lógico, por intención y nunca por capa. Los tests y la documentación van con el cambio al que pertenecen. |
 | 🔐 **Cuida lo que se sube** | Detecta tokens, claves, contraseñas y cadenas de conexión escritas en el código, y deja fuera los `.env`, las notas de sesión, los logs, los dumps y otros archivos sobrantes. Te dice qué dejó fuera y por qué. |
 | 🚫 **Sin firmas de IA** | Ni `Co-Authored-By` de herramientas de IA, ni «Generated with», ni 🤖. |
 | ⚡ **Ahorra tokens** | Un solo archivo corto guía todo el flujo. El catálogo completo solo se lee cuando hace falta. |
@@ -134,9 +134,9 @@ flowchart LR
 |---|---|
 | **gitmoji** | Sale de la lista permitida del tipo. Relevante para la intención del commit, nunca elegido solo por el área. Se usa el carácter del emoji, salvo que el repo use `:shortcodes:`. |
 | **tipo** | Uno de los 11 tipos de abajo, siempre en inglés y en minúsculas. |
-| **scope** | Un dominio en minúsculas: `auth`, `checkout`, `pedidos`. Nunca un archivo, una clase ni un componente. Debe coincidir con los scopes existentes en el historial. |
+| **scope** | Un dominio en minúsculas: `auth`, `checkout`, `pedidos`. Nunca un archivo, una clase, una tabla ni un componente. Se reutiliza el del historial cuando encaja. |
 | **título** | Qué cambió, sin empezar con verbo, sin punto final y sin repetir el scope. Unos 50 caracteres ideales; máximo 72. |
-| **cuerpo** | Qué cambió, por qué y qué impacto tiene, en prosa. En cambios grandes se admite una lista corta de comportamientos. |
+| **cuerpo** | Qué cambió, por qué y qué impacto tiene, en prosa, con líneas de 72. Se entiende solo con `git log`: nada de "ver X". En cambios grandes se admite una lista corta de comportamientos. |
 
 ### Tipos
 
