@@ -4,7 +4,7 @@ description: 'Writes git commits with gitmoji and Conventional Commits (`<gitmoj
 license: MIT
 metadata:
   author: CXmiloxx
-  version: "1.3.0"
+  version: "1.0.0"
 ---
 
 # Gitmoji Commits

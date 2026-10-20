@@ -2,7 +2,7 @@
 
 All notable changes to gitmoji-commits are documented here.
 
-## [1.3.0] — 2026-10-20
+## [1.0.0] — 2026-10-20
 
 ### Changed
 
@@ -16,7 +16,7 @@ All notable changes to gitmoji-commits are documented here.
 - Instruction files (`SKILL.md`, `AGENTS.md`…) moved out of the leftovers list, where they could be left unstaged.
 - Title examples now carry their gitmoji; the dependency example is `⬆️ build(deps)` instead of `chore` with a leading verb.
 
-## [1.2.0] — 2026-10-13
+## [0.3.0] — 2026-10-13
 
 ### Changed
 
@@ -33,7 +33,7 @@ All notable changes to gitmoji-commits are documented here.
 - Table of wrong pairs that look reasonable (`🗃️ feat`, `💄 feat`, `🦺 feat`, `📚 docs`…).
 - Ambiguous cases for database restructuring and permissions.
 
-## [1.1.0] — 2026-09-15
+## [0.2.0] — 2026-09-15
 
 ### Changed
 
@@ -59,7 +59,7 @@ All notable changes to gitmoji-commits are documented here.
 - Standalone final checklist (section 12 — merged into section 8).
 - Multi-language title examples table (examples now show intent, not just language).
 
-## [1.0.0] — 2026-09-15
+## [0.1.0] — 2026-09-15
 
 ### Added
 
