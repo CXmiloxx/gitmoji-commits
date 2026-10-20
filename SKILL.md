@@ -4,7 +4,7 @@ description: 'Writes git commits with gitmoji and Conventional Commits (`<gitmoj
 license: MIT
 metadata:
   author: CXmiloxx
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Gitmoji Commits
@@ -73,7 +73,6 @@ When you find a secret:
 **Leftovers** are new files that don't belong to the change:
 
 - **Session notes** left behind by a person or an agent: Markdown plans, summaries, reports, TODO lists or scratch files (`PLAN.md`, `NOTES.md`, `SUMMARY.md`, `TODO.md`, `*-notes.md`, `scratch*`…). Treat one as a leftover when nothing in the project links to it and it reads like working notes rather than documentation.
-- **Instruction files** that are the product, not documentation: `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, rules read by an agent, templates. Their changes go to step 4 (type decision), not `docs`.
 - **Temporary or generated files:**
   - logs and temp files: `*.log`, `*.tmp`, `*.bak`, `*.orig`, `*.rej`, `*.swp`, `*~`
   - OS files: `.DS_Store`, `Thumbs.db`
@@ -83,6 +82,8 @@ When you find a secret:
 - **Personal settings:** `*.local.*`, `.claude/settings.local.json`, and editor folders (`.idea/`, `.vscode/`) unless the repository already versions them.
 - **Paths excluded by the user** (e.g., "only code, not docs"). Treat as leftovers and list them at the end.
 
+Instruction files (`SKILL.md`, `AGENTS.md`, `CLAUDE.md`, agent rules, templates) are not leftovers: they are the product. Commit them, and decide their type in section 4, not as `docs`.
+
 Don't stage leftovers, and never delete them. List them in one line at the end. If they keep showing up, offer a separate `🙈 chore` commit that adds them to `.gitignore`.
 
 ## 3. Group
@@ -90,10 +91,20 @@ Don't stage leftovers, and never delete them. List them in one line at the end. 
 - Each commit holds one functional intent that can be reviewed or reverted on its own.
 - Use as few commits as possible without mixing intents. Avoid artificially tiny commits and giant mixed ones alike.
 - Tests, docs, config and dependencies that exist *for* a change go in the same commit as that change. A manifest and its lockfile always go together.
+- **Split by intent, never by layer.** The migration, model, endpoint, screen and tests of one feature are one `✨ feat` commit. A piece of a feature never gets its own commit when the rest of the feature is part of the same change: a lone migration or a lone endpoint changes nothing a user can see, and reverting it alone breaks the feature.
 - If a refactor enables a feature, commit the refactor first and the feat second.
 - Keep what the user already staged unless they asked you to regroup.
 
 If there is more than one group, show the plan as one line per commit (title and files), then proceed.
+
+**A large diff is several intents until proven otherwise.** Before writing one big commit, list what the diff does in one line each. Each line that would get a different type or gitmoji on its own is a separate commit:
+
+- a security fix (missing permission check, passwords written to logs) → its own `🔒️ fix`
+- a bug fixed along the way (duplicate emails on retry) → its own `🐛 fix`
+- a restructure that enables the feature (shared code extracted, folders reorganized) → `♻️ refactor` first
+- the new capability itself → `✨ feat` last
+
+If the user explicitly asks for a single commit, the title follows the main intent, and the body still names every other one, so none is hidden inside a `feat`.
 
 **Handling mixed changes in one file:** If one file has changes for different intents, extract the relevant hunks manually. Generate the diff with context (`-U3` or `-U1 --inter-hunk-context=0`), apply hunks selectively to a copy of the original, verify the copy (structure intact), then stage via `git update-index --cacheinfo` without touching the working tree. Never use `--unidiff-zero` to insert lines without context.
 
@@ -202,6 +213,19 @@ This check runs twice: once before the message is written, and once on the real 
 
 2. After committing, read the header back with `git log -1 --format=%s` and check it again: the emoji is the first thing, then a space and an allowed type. If it fails and the commit has not been pushed, fix it with `git commit --amend -F <message file>`.
 
+Two pairs fail fast, without opening the table: `feat` with anything other than ✨ or 💥, and 💥 without `!` in the header.
+
+When the message is written, check the header against this shape, character by character:
+
+```
+<gitmoji> <type>(<scope>)<!>: <title>
+```
+
+- exactly one space after the gitmoji, none before the colon, one after it
+- `type` lowercase English, one of the 11 types
+- `(scope)` lowercase, no spaces; `!` only with 💥, right before the colon
+- no trailing period, header within 72 characters
+
 ## 6. Language
 
 Go through these in order and stop at the first that applies. It works for any language.
@@ -228,7 +252,7 @@ Translate one of them only if the user asks you to. Everyday words are still tra
 <body>
 ```
 
-**Scope** is one lowercase domain: `auth`, `checkout`, `orders`, `notifications`. Never a file, component, class, route or variable name. Reuse the scopes in history. A technical layer (`schema`, `db`, `api`, `ui`, `backend`) is not a domain: use the business domain the change belongs to (`empresas`, `pagos`), unless history already uses that layer as a scope consistently.
+**Scope** is one lowercase domain: `auth`, `checkout`, `orders`, `notifications`. Never a file, component, class, route, table or variable name. Reuse a scope from history when one fits; create a new one only for a new area. A technical layer (`schema`, `db`, `api`, `ui`, `backend`) is not a domain: use the business domain the change belongs to (`empresas`, `pagos`), unless history already uses that layer as a scope consistently.
 
 **Title** is a noun phrase answering "what changed?" the way you'd tell a colleague in one sentence.
 
@@ -243,13 +267,46 @@ Translate one of them only if the user asks you to. Everyday words are still tra
 
 | ❌ | ✅ | |
 |---|---|---|
-| `fix(auth): bug` | `fix(auth): sessions closed after password change` | Specific, says which bug |
-| `feat(api): add authentication` | `feat(api): sign-in with Google accounts` | Noun phrase, no verb |
-| `perf(orders): Redis cache in OrderService` | `perf(orders): faster history for large accounts` | Effect, not implementation |
-| `refactor: improvements` | `refactor(checkout): address validator extracted` | Domain scope, concrete |
-| `chore: updated dependencies` | `chore(deps): upgrade React to v18.2` | Specific, not vague |
+| `🐛 fix(auth): bug` | `🐛 fix(auth): sessions closed after password change` | Specific, says which bug |
+| `✨ feat(api): add authentication` | `✨ feat(auth): sign-in with Google accounts` | Noun phrase, no verb |
+| `🌐 feat(checkout): pt-BR locale file` | `✨ feat(checkout): checkout available in Portuguese` | `feat` is ✨; the user's gain, not the file |
+| `⚡️ perf(orders): Redis cache in OrderService` | `⚡️ perf(orders): faster history for large accounts` | Effect, not implementation |
+| `♻️ refactor: improvements` | `♻️ refactor(checkout): address validator extracted` | Domain scope, concrete |
+| `🔧 chore: updated dependencies` | `⬆️ build(deps): React 18.2` | Right type and gitmoji, no verb |
 
 **Body** says what changed, why, and what the impact is, in prose. Skip it only for trivial commits (typo, formatting, dependency bump).
+
+Write it for a teammate who was not in the session and doesn't know the domain. For a `feat` or `fix`, the body answers three questions, in this order, in full sentences:
+
+1. **Before.** What was missing or wrong, and what that caused for the user.
+2. **Now.** What the user can do or sees now, told as the flow they go through, not as a list of rules. Fallbacks and edge cases are explained step by step ("when X is missing, it uses Y; if Y is missing too, Z").
+3. **Why it matters.** The effect: fewer errors, less support work, no manual step.
+
+A technical detail (endpoint, cache time, limit) goes in only with its reason ("the link expires after 24 hours because the file holds customer data"). A detail without a reason is noise.
+
+The test: after reading the commit, could that teammate explain the feature to someone else? If not, rewrite it. Packing many facts into short sentences and parentheses does not make a body clear: it makes it shorter and harder to read.
+
+```
+❌ ✨ feat(reports): background export
+
+   Exports over 5,000 rows go to a queue (ExportJob, 24 h link). Under
+   that, direct download. Failures notify by email.
+
+✅ ✨ feat(reports): large exports delivered by email
+
+   Exporting a big report froze the page for minutes and often ended in
+   a timeout, so users split it by date and exported it in parts.
+
+   Reports over 5,000 rows are now prepared in the background: the user
+   keeps working and gets an email with a download link when the file is
+   ready. Smaller reports still download right away, as before. The link
+   expires after 24 hours because the file holds customer data.
+
+   If the export fails, the email says so and offers a retry, so nobody
+   waits for a file that will never arrive.
+```
+
+The ❌ title names the mechanism, not what the user gains, and its body lists rules without saying what was wrong before, why the link expires, or what the user sees when it fails.
 
 A small change:
 
@@ -267,9 +324,7 @@ A large change across related areas:
 ✨ feat(notificaciones): correos sobre el estado del pedido
 
 Los clientes reciben un correo cada vez que su pedido cambia de estado,
-sin tener que entrar a su cuenta para revisarlo.
-
-Los cambios principales incluyen:
+sin tener que entrar a su cuenta para revisarlo. Con esto llegan:
 
 - Aviso al confirmar, enviar y entregar el pedido.
 - Preferencias para desactivar cada tipo de aviso.
@@ -279,11 +334,28 @@ Los cambios principales incluyen:
 **Body rules:**
 - Explain why, not just what.
 - Say impact or effect ("users no longer see X", "queries 10x faster").
-- No changelog-style headings, lists of files, line-by-line explanations.
+- **Self-contained.** The reader has only `git log`: no chat, no PR, no session. Never send them somewhere else with "see…", "ver…", "voir…", "as explained", "check the docs" or "(ver X)". If something matters, write it in the body. If a file truly holds the details, give its path from the repository root (`docs/deploy.md`) and say what it holds, never just "see X".
+- **Plain words.** Name things the way the code or the user does. A term only your session invented ("the new pipeline", "phase 2 handler") means nothing to the reader: use the real identifier in backticks (`POST /invoices/{id}/send`, `SMTP_HOST`) or describe the effect.
+- No section headings inside the body ("Changes:", "Summary:"), no lists of files, no line-by-line explanations. A short list of behaviors is allowed for large changes, as in the example above.
 - No metrics unless they're verifiable and relevant ("queries 10x faster", not "much better").
+- Wrap lines at 72 characters. One blank line between paragraphs.
 - No AI signature or credit. That includes `Co-Authored-By` naming an AI, session links, model names.
 
 Allowed trailers: `BREAKING CHANGE:`, issue references (`Refs #123`, `Closes #123`), human `Co-authored-by`.
+
+**`BREAKING CHANGE:` footer.** Written for whoever has to update their deploy or client. One footer per break, each saying what changed and exactly what they must do, with the real names:
+
+```
+❌ BREAKING CHANGE: some fields and flags changed (see the migration
+   guide). Old exports are no longer supported by the new flow.
+
+✅ BREAKING CHANGE: user responses no longer include `fullName`; read
+   `firstName` and `lastName` and join them on the client.
+✅ BREAKING CHANGE: the CLI flag `--out` is now `--output`; scripts
+   that pass `--out` fail with "unknown option".
+```
+
+The ❌ version mixes several breaks, sends the reader to a guide without saying where it is, and names nothing a consumer could search for in their code.
 
 ## 8. Commit
 
@@ -302,10 +374,12 @@ For several commits in succession, write `GITMOJI_MSG_01`, `GITMOJI_MSG_02`… b
 
 - [ ] **Type**: Ran through section 4 step by step. First yes wins. For step 6c, consulted ambiguous cases below.
 - [ ] **Gitmoji**: Chosen after the type, from that type's row of the allowlist only. Relevant to the intent, not just to the files. Gate of 5b stated aloud.
-- [ ] **Scope**: Domain name (not file path). Matches history.
+- [ ] **Header**: Matches `<gitmoji> <type>(<scope>)<!>: <title>`, spacing and case exact, within 72.
+- [ ] **Scope**: Domain name (not file, table, class or layer). Reused from history when one fits.
 - [ ] **Title**: Noun phrase, no verb. ~50 chars. Doesn't repeat scope.
-- [ ] **Body**: Explains why and impact. No headings, lists of files, or metrics unless verifiable.
-- [ ] **Contents**: One intent. Revertible on its own. No secrets, temp files, session notes.
+- [ ] **Body**: Before → now → why it matters, in full sentences. Someone outside the session could explain the feature after reading it. Every technical detail carries its reason. Readable with nothing but `git log`: no "see/ver X", no session-only terms. Wrapped at 72. No headings, lists of files, or metrics unless verifiable.
+- [ ] **Breaking**: One `BREAKING CHANGE:` per break, each with the real name and the action consumers must take.
+- [ ] **Contents**: One intent, not one layer. Revertible on its own. No security or bug fix hidden inside a `feat`. No secrets, temp files, session notes.
 
 **After each commit, extract and check the intermediate commit if you separated hunks:**
 
@@ -339,4 +413,4 @@ These pairs appear in many codebases. Decide by asking: *was this broken/missing
 - **First commit of a repository.** `🎉 chore(project): <what the project is>`.
 - **Revert.** Run `git revert --no-commit <hash>`, then commit as `⏪️ revert(scope): <title of the reverted commit>`. The body names the hash and reason.
 - **Amend.** Only if the user asks and the commit has not been pushed.
-- **Breaking change:** Criteria: removed or renamed API path/field, field type changed, parameter required when optional, behavior by default different. Type stays as above, gitmoji becomes 💥, add `!` after scope, include `BREAKING CHANGE: <what consumers must change>` in body.
+- **Breaking change:** Criteria: removed or renamed API path/field, field type changed, parameter required when optional, behavior by default different. Type stays as above, gitmoji becomes 💥, add `!` after scope, add one `BREAKING CHANGE: <what changed and what consumers must do>` footer per break (section 7).

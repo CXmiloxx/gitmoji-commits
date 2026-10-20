@@ -2,6 +2,20 @@
 
 All notable changes to gitmoji-commits are documented here.
 
+## [1.3.0] — 2026-10-20
+
+### Changed
+
+- Body for `feat` and `fix` follows before → now → why it matters, written for a teammate outside the session, with a ❌/✅ example. Technical details (endpoint, limit, expiry) only with their reason.
+- Body must be self-contained: no "see/ver X" pointers. A referenced file is named by its path from the repository root together with what it holds.
+- Body uses the code's real names (identifiers in backticks) instead of terms invented during the session. Lines wrap at 72 characters. No section headings inside the body.
+- `BREAKING CHANGE:` uses one footer per break, each with the real name and the action consumers must take, with a ❌/✅ example.
+- Grouping is by intent, never by layer, and a large diff is split so security and bug fixes don't hide inside a `feat`.
+- `feat` pairs fail fast, and the header is checked against its exact shape (`<gitmoji> <type>(<scope>)<!>: <title>`, spacing, case, 72 characters).
+- Scope may be new for a new area, and is never a table name.
+- Instruction files (`SKILL.md`, `AGENTS.md`…) moved out of the leftovers list, where they could be left unstaged.
+- Title examples now carry their gitmoji; the dependency example is `⬆️ build(deps)` instead of `chore` with a leading verb.
+
 ## [1.2.0] — 2026-10-13
 
 ### Changed

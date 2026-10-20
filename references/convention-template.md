@@ -20,6 +20,8 @@ Programming terms stay in English (dashboard, endpoint, deploy, token, cache…)
 <!-- one row per type the project uses, default gitmoji first; add the specific
      gitmojis seen in history (e.g. 💄, 🗃️, ⬆️) with a one-line "when" -->
 
+`feat` always uses ✨. Area gitmojis (🌐, 🛂, 🚸…) never go with `feat`: a feature that adds a language or a role is still `✨ feat`.
+
 A breaking change uses 💥 and `!`: `💥 feat(api)!: …` plus a `BREAKING CHANGE:` footer.
 
 ## Scopes
@@ -38,10 +40,11 @@ A noun phrase that says what changed, without repeating the scope, with no leadi
 
 ## Body
 
-What changed, why, and the impact, in prose. A short list of behaviors is allowed for large changes. Never file lists, changelog headings or AI credit.
+What changed, why, and the impact, in prose, wrapped at 72 characters. It must make sense with only `git log`: no "see X" pointers. A short list of behaviors is allowed for large changes. Never file lists, changelog headings or AI credit.
+Each `BREAKING CHANGE:` footer names one break and what consumers must do.
 <!-- trailers the project uses, e.g. "Refs #123" -->
 
 ## Grouping
 
-One functional intent per commit. Tests, docs and dependencies that exist for a change travel with it.
+One functional intent per commit, never one layer per commit. The migration, code, tests and docs of a change travel together.
 ```
