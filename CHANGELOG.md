@@ -16,6 +16,11 @@ All notable changes to gitmoji-commits are documented here.
 - Instruction files (`SKILL.md`, `AGENTS.md`…) moved out of the leftovers list, where they could be left unstaged.
 - Title examples now carry their gitmoji; the dependency example is `⬆️ build(deps)` instead of `chore` with a leading verb.
 
+### Documentation
+
+- Both READMEs (English and Spanish) show a badge with the latest release and link to `CHANGELOG.md`.
+- Grouping by intent, scope reuse and self-contained bodies are described in both READMEs.
+
 ## [0.3.0] — 2026-10-13
 
 ### Changed
