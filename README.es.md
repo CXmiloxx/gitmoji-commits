@@ -6,12 +6,13 @@
 
 gitmoji + Conventional Commits · cualquier idioma · sin dependencias · Linux, macOS y Windows
 
+[![Release](https://img.shields.io/github/v/release/CXmiloxx/gitmoji-commits)](https://github.com/CXmiloxx/gitmoji-commits/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![skills.sh](https://img.shields.io/badge/skills.sh-install-black)](https://skills.sh)
 [![Dependencias](https://img.shields.io/badge/dependencias-ninguna-brightgreen)](#compatibilidad)
 [![Plataformas](https://img.shields.io/badge/plataformas-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](#compatibilidad)
 
-[English](README.md) · [Español](README.es.md)
+[English](README.md) · [Español](README.es.md) · [Changelog](CHANGELOG.md)
 
 </div>
 
