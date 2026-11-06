@@ -1,0 +1,7 @@
+co-authored-by:.*(claude|anthropic|openai|chatgpt|gpt-[0-9]|copilot|cursor|gemini|codex|devin|windsurf|aider|[^a-z]ai[^a-z])
+generated (with|by) .*(claude|[^a-z]ai([^a-z]|$)|gpt|copilot|cursor|gemini|codex|agent)
+🤖
+claude\.ai/|chatgpt\.com/|anthropic\.com
+^(changes|summary|changelog|files changed|modified files|resumen|cambios|archivos modificados|modifications|résumé|alterações|änderungen) ?:?$
+^[^ ]+ [a-z]+(\([^)]*\))?!?: (add|adds|added|adding|fix|fixes|fixed|fixing|update|updates|updated|remove|removes|removed|implement|implements|implemented|create|creates|created|refactor|refactored|improve|improves|improved|agrega|agregar|agregado|agregados|añade|añadir|añadido|corrige|corregir|corregido|actualiza|actualizar|actualizado|elimina|eliminar|eliminado|implementa|implementar|implementado|crea|crear|creado|ajoute|ajouter|ajouté|corriger|supprime|supprimer|adiciona|adicionar|corrigir|atualiza|atualizar|remove|remover|hinzufügen|entfernen|aktualisieren|behebt)( |$)
+^(🚧|💩|🍻|:construction:|:poop:|:beers:) 

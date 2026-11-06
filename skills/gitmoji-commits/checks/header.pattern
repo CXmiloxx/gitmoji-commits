@@ -1,0 +1,12 @@
+^(✨|:sparkles:) feat(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(🐛|:bug:|🚑️|:ambulance:|🔒️|:lock:|🩹|:adhesive_bandage:|🥅|:goal_net:|👔|:necktie:|💄|:lipstick:|🚸|:children_crossing:|📱|:iphone:|💫|:dizzy:|💬|:speech_balloon:|♿️|:wheelchair:|🌐|:globe_with_meridians:|🔍️|:mag:|📈|:chart_with_upwards_trend:|🛂|:passport_control:|🦺|:safety_vest:|✈️|:airplane:|👽️|:alien:|🗃️|:card_file_box:|🧵|:thread:|🦖|:t-rex:|🏷️|:label:|🚨|:rotating_light:|✏️|:pencil2:|🍱|:bento:|🩺|:stethoscope:|🚩|:triangular_flag_on_post:) fix(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(♻️|:recycle:|🏗️|:building_construction:|⚰️|:coffin:|🗑️|:wastebasket:|🏷️|:label:|🔥|:fire:|🚚|:truck:|🦖|:t-rex:) refactor(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(⚡️|:zap:|🗃️|:card_file_box:|🧵|:thread:) perf(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(🎨|:art:|🚨|:rotating_light:) style(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(📝|:memo:|💡|:bulb:|✏️|:pencil2:|👥|:busts_in_silhouette:|📄|:page_facing_up:) docs(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(✅|:white_check_mark:|🧪|:test_tube:|🤡|:clown_face:|📸|:camera_flash:) test(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(📦️|:package:|⬆️|:arrow_up:|⬇️|:arrow_down:|📌|:pushpin:|➕|:heavy_plus_sign:|➖|:heavy_minus_sign:|🧱|:bricks:|🔧|:wrench:|🔨|:hammer:) build(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(👷|:construction_worker:|💚|:green_heart:|🚀|:rocket:|🧱|:bricks:|🔐|:closed_lock_with_key:) ci(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(🔧|:wrench:|🎉|:tada:|🔖|:bookmark:|🙈|:see_no_evil:|🔨|:hammer:|🧑‍💻|:technologist:|🔐|:closed_lock_with_key:|🌱|:seedling:|🔊|:loud_sound:|🔇|:mute:|🧐|:monocle_face:|🍱|:bento:|🩺|:stethoscope:|🚩|:triangular_flag_on_post:|⚗️|:alembic:|💸|:money_with_wings:|🥚|:egg:|📄|:page_facing_up:|🔀|:twisted_rightwards_arrows:|🔥|:fire:|🚚|:truck:|👥|:busts_in_silhouette:|🚀|:rocket:) chore(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(⏪️|:rewind:) revert(\([a-z0-9][a-z0-9._/,-]*\))?: [^ ](.*[^. ])?$
+^(💥|:boom:) (feat|fix|refactor|perf|style|docs|test|build|ci|chore|revert)(\([a-z0-9][a-z0-9._/,-]*\))?!: [^ ](.*[^. ])?$

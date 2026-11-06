@@ -1,0 +1,5 @@
+^.{73,}$
+(^|[ (])(see|ver|voir|veja|siehe) [^ ]
+(as|like) (explained|discussed|mentioned) (above|before|earlier)|como se (explicó|mencionó|habló)|comme expliqué|wie besprochen
+(^|[ (])(phase|fase|step|paso|étape|etapa) [0-9]
+(^|[^a-z])(todo|wip|fixme|tbd)([^a-z]|$)

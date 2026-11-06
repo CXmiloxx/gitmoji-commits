@@ -1,7 +1,7 @@
 # Convention template
 
-Fill in every `<…>` with what the repository's history and files show, and delete the comments.
-Write the whole document in the commit language.
+Used only when the user asks to document the commit convention. Fill in every `<…>` with what the repository's history and files show, delete the comments, and save the result as `COMMIT_CONVENTION.md` at the repository root.
+Write the whole document in the commit language. Every example header must pass `checks/header.pattern`.
 
 ```markdown
 # Commit convention
@@ -17,8 +17,11 @@ Programming terms stay in English (dashboard, endpoint, deploy, token, cache…)
 
 | Type | Gitmoji | When |
 |---|---|---|
-<!-- one row per type the project uses, default gitmoji first; add the specific
-     gitmojis seen in history (e.g. 💄, 🗃️, ⬆️) with a one-line "when" -->
+<!-- one row per type the project uses, default gitmoji first, then the specific
+     gitmojis the project uses (e.g. 💄, 🗃️, ⬆️) with a one-line "when".
+     Every pair must come from the allowlist in SKILL.md step 5. A pair seen in
+     history but missing from the allowlist (🗃️ feat, 📚 docs) is not written
+     here unless the user explicitly asks to allow it. -->
 
 `feat` always uses ✨. Area gitmojis (🌐, 🛂, 🚸…) never go with `feat`: a feature that adds a language or a role is still `✨ feat`.
 

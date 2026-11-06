@@ -2,7 +2,7 @@
 
 All 75 gitmojis. This file is the only source of truth for which type a gitmoji may carry.
 
-**How to read it.** Decide the type first (SKILL.md section 4), then read only that type's section. Each section is complete: it lists every gitmoji that type may use, including the ones borrowed from another type under a condition (rows marked *conditional*). A gitmoji missing from your type's section is not allowed for that type. History never changes that.
+**How to read it.** Decide the type first (SKILL.md step 4), then read only that type's section. Each section is complete: it lists every gitmoji that type may use, including the ones borrowed from another type under a condition (rows marked *conditional*). A gitmoji missing from your type's section is not allowed for that type. History never changes that.
 
 - **Type** is the one type the gitmoji belongs to. Use it unless the Exception applies.
 - **Exception** is the only other type allowed, and the literal condition that must be true to use it. `—` means there is no second type.
@@ -10,7 +10,7 @@ All 75 gitmojis. This file is the only source of truth for which type a gitmoji 
 
 **`feat` only pairs with ✨ and 💥.** The official gitmoji catalog gives every gitmoji a `semver` level, and Conventional Commits bumps MINOR on `feat`. Only ✨ is `minor` and only 💥 is `major`; every other gitmoji is `patch` or `null`, so pairing one with `feat` claims a version bump the gitmoji does not carry. A change that lets someone do something they could not do before is `✨ feat`, whatever area it touches (database, UI, permissions, validation). Every other gitmoji describes a change to something that already exists, so a *Use for* below never covers "new".
 
-`⚡️` and `⚡` (with or without the variation selector) are the same gitmoji.
+Write every gitmoji exactly as this table shows it, variation selector included: `⚡️`, not `⚡`. Tools such as `commitlint-config-gitmoji` compare bytes and reject the bare form, and `checks/header.pattern` does too.
 
 ## feat
 
