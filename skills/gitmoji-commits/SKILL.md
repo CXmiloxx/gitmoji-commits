@@ -4,7 +4,7 @@ description: 'Writes git commits with gitmoji and Conventional Commits (`<gitmoj
 license: MIT
 metadata:
   author: CXmiloxx
-  version: "1.0.0"
+  version: "1.1.0"
 allowed-tools: Bash(git status:*) Bash(git diff:*) Bash(git log:*) Bash(git ls-files:*) Bash(git rev-parse:*) Bash(git grep:*) Bash(git add:*) Bash(git restore --staged:*) Bash(git apply --cached:*) Bash(git commit -F:*) Read Write
 ---
 

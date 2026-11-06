@@ -2,6 +2,39 @@
 
 All notable changes to gitmoji-commits are documented here.
 
+## [1.1.0] — 2026-11-06
+
+### Added
+
+- `checks/header.pattern`, `checks/forbidden.pattern` and `checks/review.pattern`: the agent validates every message with `git grep --no-index` before committing. The header check rejects malformed headers and every pair outside the allowlist; the forbidden check catches AI credit, leading verbs in five languages, body headings and WIP gitmojis; the review check flags long lines, "see X" pointers and session-only terms. Only git is needed, on every OS.
+- Explicit rule precedence: user request, then repository rules, then the skill, then history (format only).
+- "Rules that never bend": no `--no-verify`, no `--no-gpg-sign`, no push, no amend of pushed commits, no commit during a merge or rebase.
+- A fixed plan format before several commits, a commit order (security fixes, bug fixes, refactors, feature, the rest) and a fixed final report.
+- Body guidance for `refactor`, `perf`, `build` and `revert`, with examples.
+- `references/special-cases.md`: failing or rewriting hooks, commitlint without a gitmoji parser, `.gitmojirc`, signed commits, DCO, detached HEAD, large files, submodules, "improve a message only".
+- `tools/build_checks.py` and `tests/`: regenerate `header.pattern` from the catalog and fail when the catalog, the allowlist in `SKILL.md`, the pattern, the fixtures or the versions in `SKILL.md` and `.claude-plugin/plugin.json` disagree. CI runs it on every push.
+- Claude Code plugin and marketplace manifests in `.claude-plugin/`: `/plugin install gitmoji-commits --marketplace CXmiloxx/gitmoji-commits`. They point at the same skill folder as `npx skills add`, so there is no copy to keep in sync.
+- `allowed-tools` in the frontmatter, limited to the git commands the skill runs, so agents that support it ask for fewer permissions.
+- `tools/link-local.sh`: links `~/.agents/skills/gitmoji-commits` and `~/.claude/skills/gitmoji-commits` to the checkout for local development.
+- Staged-only mode: when the user staged something themselves, only that is committed and the unstaged rest is reported.
+- Issue references taken from the branch name when history uses them.
+- Diffs are read with `--no-ext-diff`, and lockfiles, minified bundles, snapshots and binaries are judged by `--stat` only.
+
+### Changed
+
+- The skill lives in `skills/gitmoji-commits/` (`SKILL.md`, `references/`, `checks/`). Only that folder is installed; tests, tools and READMEs stay in the repository.
+- Gitmojis are written exactly as the catalog spells them, variation selector included (`⚡️`, not `⚡`), and `header.pattern` rejects the bare form, matching `commitlint-config-gitmoji`.
+- `SKILL.md` keeps only what every commit needs. Type examples and ambiguous cases moved to `references/types.md`, message examples to `references/message.md`, hunk splitting to `references/splitting.md`. A table says when to read each file.
+- Hunk splitting uses `git diff --output` and `git apply --cached --recount` instead of hand-built blobs and `git update-index --cacheinfo`. Commits built from part of a file are verified in a `git worktree` instead of `git archive | tar`.
+- `SKILL.md` body is about a quarter shorter (18.4k to 14k characters), inside the Agent Skills size guideline, with the same rules.
+- Pushing is allowed when the user asks for it; before, "never push" contradicted that request.
+- Instruction files have explicit type rules: new agent capability is `feat`, corrected or adjusted behavior is `fix`, wording only is `docs`.
+
+### Fixed
+
+- gitmoji-cli configuration is read with its real keys (`emojiFormat`, `scopePrompt`, `capitalizeTitle`, and the `"gitmoji"` key in `package.json`) instead of `format` and `scopes`, which don't exist.
+- `references/convention-template.md` is now referenced from the skill and no longer tells the agent to copy gitmojis seen in history, which contradicted "history never decides the pair".
+
 ## [1.0.0] — 2026-10-20
 
 ### Changed
