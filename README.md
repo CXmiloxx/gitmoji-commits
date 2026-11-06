@@ -60,8 +60,10 @@ One intent per commit. A title that says what changed. A body that explains why 
 | 📦 **Groups changes** | It splits your working tree into single-intent commits, in logical order, by intent and never by layer. Tests and docs travel with the change they belong to. |
 | 🔐 **Guards what gets committed** | It finds hardcoded tokens, keys, passwords and connection strings, and leaves out `.env` files, session notes, logs, dumps and other leftovers. It tells you what it skipped and why. |
 | 🚫 **No AI signatures** | No `Co-Authored-By` for AI tools, no "Generated with", no 🤖. |
-| ⚡ **Light on tokens** | One short file drives the whole flow. The full catalog is read only when needed. |
-| 💻 **Portable** | Only `git`. No scripts, no Node, no Python. It works in bash, zsh, PowerShell and cmd. |
+| ✅ **Checked by git itself** | Before each commit, three `git grep` checks run on the message: the header shape and the type–gitmoji pair, forbidden content (AI credit, leading verbs, body headings) and warnings (lines over 72, "see X" pointers, session-only terms). Same result on every OS. |
+| 🧾 **Predictable output** | A plan before several commits and the same short report at the end: commits made, files left out, notes. |
+| ⚡ **Light on tokens** | `SKILL.md` holds what every commit needs. Ambiguous cases, examples, hunk splitting and special cases live in separate files read only when they come up. |
+| 💻 **Portable** | Only `git`. No scripts, no Node, no Python at runtime. It works in bash, zsh, fish, PowerShell and cmd. |
 
 ## Install
 
@@ -78,7 +80,13 @@ npx skills add CXmiloxx/gitmoji-commits -g
 npx skills add CXmiloxx/gitmoji-commits -a '*'
 ```
 
-Manual install: copy this folder into your agent's skills directory, for example `.claude/skills/gitmoji-commits/` or `.agents/skills/gitmoji-commits/`.
+As a Claude Code plugin:
+
+```
+/plugin install gitmoji-commits --marketplace CXmiloxx/gitmoji-commits
+```
+
+Manual install: copy `skills/gitmoji-commits/` into your agent's skills directory, for example `.claude/skills/gitmoji-commits/` or `.agents/skills/gitmoji-commits/`. That folder is the whole skill; the rest of the repository is documentation and maintainer tooling.
 
 ## Usage
 
@@ -106,7 +114,9 @@ flowchart LR
     C --> D[Pick the gitmoji]
     D --> E[Resolve the language]
     E --> F[Write the message]
-    F --> G[Commit]
+    F --> V[Validate with git grep]
+    V --> G[Commit]
+    G --> R[Report]
 ```
 
 1. **Read.** It runs `git status`, the diff stats, the last 20 commit subjects, and looks for existing rules (commitlint, `COMMIT_CONVENTION.md`, `CONTRIBUTING`).
@@ -120,7 +130,9 @@ flowchart LR
 5. **Gitmoji.** Only after the type is settled. It starts from the type's default and may switch to another gitmoji only from that type's allowlist, when its use describes the intent of the whole commit and not just the files touched (database, UI). The pair is stated before writing the message and checked again on the real header after the commit.
 6. **Language.** In order of priority: what you ask for, then the convention file, then the history, then the README, then the language you write in.
 7. **Message.** A noun-phrase title and a body that explains why and what the impact is.
-8. **Commit.** It stages selectively and commits through a UTF-8 file, so emojis survive on every OS.
+8. **Validate.** The pair is stated against the allowlist, then `git grep` checks the message file against `checks/header.pattern`, `checks/forbidden.pattern` and `checks/review.pattern`.
+9. **Commit.** It stages selectively and commits through a UTF-8 file, so emojis survive on every OS. A failing hook is fixed, never skipped.
+10. **Report.** Commits made, files left out and why, and any note about the history.
 
 ## Format
 
@@ -166,7 +178,7 @@ A breaking change keeps its type and adds 💥 and `!`:
 BREAKING CHANGE: clients must read results from the `items` field.
 ```
 
-The full catalog — every gitmoji with its single type and, where one exists, the condition for its only alternate type — is in [references/gitmojis.md](references/gitmojis.md).
+The full catalog — every gitmoji with its single type and, where one exists, the condition for its only alternate type — is in [skills/gitmoji-commits/references/gitmojis.md](skills/gitmoji-commits/references/gitmojis.md).
 
 ## Examples
 
@@ -232,10 +244,24 @@ The history belongs to the project and its developers. Attribution trailers add 
 
 ```
 gitmoji-commits/
-├── SKILL.md                       # the workflow the agent follows
-├── references/
-│   ├── gitmojis.md                # the 75 gitmojis, one type each (read on demand)
-│   └── convention-template.md     # used only when documenting the convention
+├── .claude-plugin/                # Claude Code plugin + marketplace manifests
+├── skills/gitmoji-commits/        # THE skill: the only folder agents load
+│   ├── SKILL.md                   # what every commit needs: rules, steps, allowlist
+│   ├── references/                # read only when the case comes up
+│   │   ├── gitmojis.md            # the 75 gitmojis, one type each
+│   │   ├── types.md               # type decision examples, ambiguous cases, wrong pairs
+│   │   ├── message.md             # scope, title and body by type, with examples
+│   │   ├── splitting.md           # one file split across commits, without git add -p
+│   │   ├── special-cases.md       # hooks, commitlint, revert, amend, merge in progress…
+│   │   └── convention-template.md # used only when documenting the convention
+│   └── checks/                    # regexes the agent runs with git grep
+│       ├── header.pattern         # header shape + valid pairs (generated from the catalog)
+│       ├── forbidden.pattern      # must never match
+│       └── review.pattern         # warnings to fix or justify
+├── tests/                         # fixtures for the checks
+├── tools/
+│   ├── build_checks.py            # regenerates the checks; verifies catalog, allowlist, versions, fixtures
+│   └── link-local.sh              # links the installed skill to this checkout
 ├── README.md
 ├── README.es.md
 └── LICENSE
@@ -244,6 +270,17 @@ gitmoji-commits/
 ## Contributing
 
 Issues and pull requests are welcome, for example a better example, a missing edge case or a language the rules don't cover well. Commits in this repository follow the skill itself.
+
+`references/gitmojis.md` is the single source of truth for pairs. After changing it or the allowlist in `SKILL.md`, run:
+
+```bash
+python3 tools/build_checks.py build   # regenerate checks/header.pattern
+python3 tools/build_checks.py check   # catalog, allowlist, pattern and fixtures agree
+```
+
+To try your edits in your own agent without copying files, run `tools/link-local.sh`: it points `~/.agents/skills/gitmoji-commits` and `~/.claude/skills/gitmoji-commits` at `skills/gitmoji-commits/` in your checkout.
+
+CI runs the same check on every push. Python is needed only for this maintainer tool, never to use the skill.
 
 ## Author
 
