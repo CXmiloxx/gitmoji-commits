@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "gitmoji-commits",
+  "description": "Git commits with gitmoji and Conventional Commits, adapted to each repository.",
+  "owner": {
+    "name": "Camilo Guapacha",
+    "url": "https://github.com/CXmiloxx"
+  },
+  "plugins": [
+    {
+      "name": "gitmoji-commits",
+      "description": "Single-intent commits with a valid gitmoji and type, validated with git before committing.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
