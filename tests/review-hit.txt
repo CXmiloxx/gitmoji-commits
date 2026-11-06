@@ -1,0 +1,7 @@
+# Every line must hit checks/review.pattern (case-insensitive).
+This line is far longer than seventy-two characters and must be flagged for wrapping.
+The limits are described elsewhere, see docs for details.
+Los límites cambian (ver README).
+As explained above, the cache is gone.
+The phase 2 handler now retries.
+TODO: remove the fallback.

@@ -1,0 +1,31 @@
+# Every line must pass checks/header.pattern and must not hit checks/forbidden.pattern.
+✨ feat(auth): sign-in with Google accounts
+🐛 fix(auth): sessions closed after a password change
+🚑️ fix(payments): duplicate charges on retry
+🔒️ fix(auth): permission check on invoice export
+👔 fix(checkout): shipping rule for remote areas
+🗃️ fix(empresas): unique constraint on tax id
+🗃️ perf(reports): index on order date
+⚡️ perf(orders): faster history for large accounts
+♻️ refactor(checkout): address validator extracted
+🔥 chore(config): unused lint presets
+🚚 refactor(api): routes grouped by domain
+🎨 style(orders): import order
+📝 docs(readme): install with the skills CLI
+✏️ fix(signup): typo in the confirmation email
+✅ test(cart): stacked coupon totals
+⬆️ build(deps): React 18.2
+🧱 ci(deploy): staging cluster definition
+🔐 chore(env): secret template for the mail service
+🙈 chore(project): editor folders ignored
+🔖 chore(release): version 1.1.0
+🎉 chore(project): commit assistant for gitmoji
+⏪️ revert(cart): stacked coupon totals
+💥 feat(api)!: paginated responses in every listing
+💥 fix(users)!: fullName split into first and last name
+🧑‍💻 chore(dev): dev container with seeded database
+:sparkles: feat(search): filter by brand and price
+:bug: fix(cart): correct total with stacked coupons
+✨ feat: dashboard export without a scope
+✨ feat(packages/ui): monorepo scope with a path
+🐛 fix(carrito): total correcto con cupones combinados

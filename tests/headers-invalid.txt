@@ -1,0 +1,25 @@
+# No line may pass checks/header.pattern.
+🗃️ feat(empresas): companies table
+💄 feat(ui): dark mode
+🦺 feat(signup): password strength rule
+🐛 refactor(orders): totals in one place
+✨ fix(cart): correct total
+📚 docs(readme): install guide
+🎨 fix(ui): new button colors
+💥 feat(api): breaking without bang
+✨ feat(api)!: bang without boom
+✨ feat(api): trailing period.
+✨ Feat(api): uppercase type
+✨feat(api): missing space after emoji
+✨  feat(api): two spaces after emoji
+✨ feat (api): space before scope
+✨ feat(api) : space before colon
+✨ feat(api):missing space after colon
+✨ feat(Api): uppercase scope
+✨ feat(my scope): space in scope
+✨ feature(api): unknown type
+feat(api): no gitmoji
+🚧 chore(wip): work in progress
+✨ feat(api): 
+🚑 fix(payments): emoji without the variation selector
+⚡ perf(orders): bare lightning bolt
